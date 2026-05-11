@@ -3,7 +3,7 @@ import { useAuthStore } from '@/shared/stores/authStore'
 import { API_URL } from '@/lib/constants'
 
 export const apiClient = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API_URL}/api/v1`,
   withCredentials: true, // send HttpOnly refresh cookie
   headers: {
     'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ apiClient.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          `${API_URL}/api/auth/refresh`,
+          `${API_URL}/api/v1/auth/refresh`,
           {},
           { withCredentials: true }
         )

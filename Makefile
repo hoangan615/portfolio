@@ -72,7 +72,7 @@ migrate-current:
 
 ## Seed initial data (owner account, categories, etc.)
 seed:
-	docker compose exec api python -m shared.scripts.seed
+	docker compose exec api python seed.py
 
 ## Create a new Alembic migration (usage: make migration MSG="add users table")
 migration:

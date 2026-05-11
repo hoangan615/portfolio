@@ -234,8 +234,9 @@ asyncio.run(wait())
     container_name: portfolio_web
     restart: unless-stopped
     environment:
-      VITE_API_URL: /api/v1
+      VITE_API_URL: ""
       VITE_WS_URL: /ws
+      VITE_APP_NAME: "Portfolio & Tech Takeaway"
     volumes:
       - ./apps/web:/app
       - /app/node_modules

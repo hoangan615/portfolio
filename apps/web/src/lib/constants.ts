@@ -1,6 +1,8 @@
-export const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'Portfolio & Community'
-export const APP_URL = import.meta.env.VITE_APP_URL ?? 'http://localhost:5173'
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+export const APP_NAME = import.meta.env.VITE_APP_NAME ?? 'Portfolio & Tech Takeaway'
+export const APP_URL = import.meta.env.VITE_APP_URL ?? 'http://localhost'
+// Empty string = relative URLs (works behind nginx proxy in Docker)
+// Set VITE_API_URL=http://localhost:8000 for local dev without Docker
+export const API_URL = import.meta.env.VITE_API_URL ?? ''
 
 export const QUERY_KEYS = {
   // Auth
