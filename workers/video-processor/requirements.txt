@@ -1,0 +1,28 @@
+# Task queue
+celery[redis]==5.4.0
+kombu==5.4.2
+redis==5.2.1
+
+# FFmpeg bindings
+ffmpeg-python==0.2.0
+
+# S3 / MinIO
+boto3==1.35.81
+botocore==1.35.81
+
+# Database (sync, used in task callbacks)
+psycopg2-binary==2.9.10
+sqlalchemy==2.0.36
+
+# Async support (for DB URL parsing)
+asyncpg==0.30.0
+
+# Config / env
+python-dotenv==1.0.1
+
+# Image processing (thumbnails)
+Pillow==11.0.0
+
+# Utilities
+python-slugify==8.0.4
+structlog==24.4.0
