@@ -912,6 +912,20 @@ textarea {
   line-height: 1.6;
 }
 
+.mailto-fallback {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(15, 118, 110, 0.08);
+  border: 1px solid rgba(15, 118, 110, 0.14);
+}
+
+.mailto-fallback strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent-strong);
+}
+
 .footer {
   padding: 30px 0 44px;
 }

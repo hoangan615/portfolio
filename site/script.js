@@ -42,8 +42,16 @@ if (yearTarget) {
 
 const contactForm = document.querySelector("[data-contact-form]");
 if (contactForm) {
+  const mailtoFallback = contactForm.querySelector("[data-mailto-fallback]");
+  const mailtoLink = contactForm.querySelector("[data-mailto-link]");
+
   contactForm.addEventListener("submit", (event) => {
     event.preventDefault();
+
+    if (!contactForm.checkValidity()) {
+      contactForm.reportValidity();
+      return;
+    }
 
     const formData = new FormData(contactForm);
     const name = String(formData.get("name") || "").trim();
@@ -71,7 +79,24 @@ if (contactForm) {
       `?subject=${encodeURIComponent(subject)}` +
       `&body=${encodeURIComponent(lines.join("\n"))}`;
 
-    window.location.href = href;
+    if (mailtoLink) {
+      mailtoLink.setAttribute("href", href);
+    }
+
+    if (mailtoFallback) {
+      mailtoFallback.hidden = false;
+    }
+
+    const tempLink = document.createElement("a");
+    tempLink.href = href;
+    tempLink.style.display = "none";
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    document.body.removeChild(tempLink);
+
+    window.setTimeout(() => {
+      window.location.assign(href);
+    }, 120);
   });
 }
 
