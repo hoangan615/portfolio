@@ -11,7 +11,7 @@ dev:
 	@echo "Services started:"
 	@echo "  App        → http://localhost"
 	@echo "  API docs   → http://localhost:8000/docs"
-	@echo "  MinIO UI   → http://localhost:9001  (minioadmin / minioadmin)"
+	@echo "  MinIO UI   → http://localhost:9101  (minioadmin / minioadmin)"
 	@echo "  Mailhog    → http://localhost:8025"
 	@echo "  Flower     → http://localhost:5555"
 

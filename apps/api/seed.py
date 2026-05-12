@@ -1,5 +1,5 @@
 """
-Seed script: creates owner account + portfolio data for Võ Hoàng An.
+Seed script: creates owner account + portfolio data for Võ Hoàng Ân.
 Run: python seed.py  (inside the api container / with venv activated after migrations)
 """
 from __future__ import annotations
@@ -38,7 +38,7 @@ async def seed_owner(db: AsyncSession):
         username=OWNER_USERNAME,
         email=OWNER_EMAIL,
         password_hash=hash_password(OWNER_PASSWORD),
-        display_name="Võ Hoàng An",
+        display_name="Võ Hoàng Ân",
         bio=(
             "Full-Stack Developer & Tech Lead at FPT Software. "
             "9+ years building scalable web and mobile applications. "

@@ -20,6 +20,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 const DashboardPostsPage = lazy(() => import('@/pages/DashboardPostsPage'))
 const DashboardVideosPage = lazy(() => import('@/pages/DashboardVideosPage'))
+const CVPage = lazy(() => import('@/pages/CVPage'))
 
 function PageLoader() {
   return (
@@ -113,6 +114,18 @@ export const router = createBrowserRouter([
         children: [{ path: '/admin', element: <AdminPage /> }],
       },
     ],
+  },
+
+  // CV page — no navbar, print-optimised
+  {
+    path: '/cv',
+    element: (
+      <div className="min-h-screen bg-gray-50">
+        <Suspense fallback={<PageLoader />}>
+          <CVPage />
+        </Suspense>
+      </div>
+    ),
   },
 
   // Root layout (just navbar)
