@@ -1013,18 +1013,13 @@ textarea {
   line-height: 1.8;
 }
 
-.cv-grid {
+.cv-flow {
   display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
-  gap: 32px;
+  gap: 28px;
   margin-top: 28px;
 }
 
 .cv-section {
-  margin-bottom: 26px;
-}
-
-.cv-section:last-child {
   margin-bottom: 0;
 }
 
@@ -1055,13 +1050,22 @@ textarea {
 }
 
 .cv-role-head strong {
+  display: block;
   font-size: 1rem;
 }
 
 .cv-role-head span,
-.cv-side-list span {
+.cv-side-list span,
+.cv-skill-item span {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.cv-role-subtitle {
+  margin-top: 3px;
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .cv-tech {
@@ -1069,6 +1073,51 @@ textarea {
   color: var(--accent);
   font-size: 0.82rem;
   font-weight: 800;
+}
+
+.cv-skill-blocks {
+  display: grid;
+  gap: 10px;
+}
+
+.cv-skill-item {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(16, 42, 67, 0.04);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.cv-skill-item strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.cv-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cv-impact-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(15, 118, 110, 0.08);
+  border: 1px solid rgba(15, 118, 110, 0.12);
+}
+
+.cv-impact-card strong {
+  display: block;
+  margin-bottom: 6px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.6rem;
+  color: var(--accent-strong);
+}
+
+.cv-impact-card span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .cv-side-list {
@@ -1105,8 +1154,7 @@ textarea {
   .hero-grid,
   .about-grid,
   .contact-grid,
-  .cta-grid,
-  .cv-grid {
+  .cta-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1186,6 +1234,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .cv-impact-grid {
+    grid-template-columns: 1fr;
+  }
+
   .cv-toolbar-actions,
   .hero-actions,
   .social-row,
@@ -1226,6 +1278,11 @@ textarea {
 
   .cv-section,
   .cv-role {
+    break-inside: avoid;
+  }
+
+  .cv-impact-card,
+  .cv-skill-item {
     break-inside: avoid;
   }
 }

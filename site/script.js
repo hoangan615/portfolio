@@ -48,16 +48,22 @@ if (contactForm) {
     const formData = new FormData(contactForm);
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim();
-    const subject = String(formData.get("subject") || "Portfolio inquiry").trim();
+    const rawSubject = String(formData.get("subject") || "").trim();
     const message = String(formData.get("message") || "").trim();
+    const subject = rawSubject || `Portfolio inquiry from ${name || "a visitor"}`;
 
     const lines = [
-      `Hello An,`,
+      `Hello Anh An,`,
       "",
-      message,
+      `I am reaching out via your portfolio site.`,
       "",
-      `Sender: ${name || "Anonymous"}`,
-      `Email: ${email || "Not provided"}`,
+      `Subject: ${subject}`,
+      "",
+      `Message:`,
+      message || "(No message provided)",
+      "",
+      `Sender name: ${name || "Anonymous"}`,
+      `Sender email: ${email || "Not provided"}`,
     ];
 
     const href =
