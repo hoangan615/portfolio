@@ -134,6 +134,7 @@ portfolio/
 - [API Reference](docs/api.md) — all endpoints
 - [Database Schema](docs/database.md) — tables and relationships
 - [Deployment](docs/deployment.md) — production guide
+- [Static GitHub Pages Guide](site/README.md) — deploy the `site/` folder automatically to GitHub Pages
 
 ---
 
