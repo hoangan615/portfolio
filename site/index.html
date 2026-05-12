@@ -77,16 +77,11 @@
               alignment matter at the same time.
             </div>
 
-            <div class="hero-actions">
-              <a class="button" href="./cv.html">View CV</a>
-              <a class="button-ghost" href="./cv.html?print=1" target="_blank" rel="noopener noreferrer">Save CV as PDF</a>
-              <a class="button-outline" href="#contact">Contact</a>
-            </div>
-
             <div class="social-row">
               <a class="social-chip" href="mailto:hoangan615@gmail.com">Email</a>
               <a class="social-chip" href="https://github.com/hoangan615" target="_blank" rel="noopener noreferrer">GitHub</a>
               <a class="social-chip" href="https://www.linkedin.com/in/an-vo-012359159/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a class="social-chip" href="https://www.tiktok.com/@tech.takeaway" target="_blank" rel="noopener noreferrer">TikTok</a>
               <span class="social-chip">Cần Thơ, Vietnam</span>
             </div>
 
@@ -509,30 +504,6 @@
         </div>
       </section>
 
-      <section class="section">
-        <div class="site-shell cta-panel reveal">
-          <div class="cta-grid">
-            <div>
-              <h2>CV and recruiter-ready version</h2>
-              <p>
-                A dedicated CV page is available for quick review, direct sharing, and PDF export. It presents the same
-                profile in a format better suited for recruiters and hiring managers.
-              </p>
-              <div class="cta-facts">
-                <span>Printable A4 layout</span>
-                <span>View in browser</span>
-                <span>Save as PDF</span>
-              </div>
-            </div>
-
-            <div class="cta-actions">
-              <a class="button" href="./cv.html">Open CV Page</a>
-              <a class="button-ghost" href="./cv.html?print=1" target="_blank" rel="noopener noreferrer">Save CV as PDF</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="section" id="contact">
         <div class="site-shell section-panel reveal">
           <div class="section-head">
@@ -540,26 +511,16 @@
               <span class="section-kicker">Contact</span>
               <h2>Get in touch</h2>
             </div>
-            <p>
-              This static version runs on GitHub Pages, so contact requests open through your local email application.
-              Direct contact links are also included below.
-            </p>
           </div>
 
-          <div class="contact-grid">
-            <div>
-              <article class="contact-card">
-                <h3>Contact information</h3>
-                <ul class="contact-list">
-                  <li>Email: <a class="contact-link" href="mailto:hoangan615@gmail.com">hoangan615@gmail.com</a></li>
-                  <li>Location: Cần Thơ, Vietnam</li>
-                  <li>LinkedIn: <a class="contact-link" href="https://www.linkedin.com/in/an-vo-012359159/" target="_blank" rel="noopener noreferrer">an-vo-012359159</a></li>
-                  <li>GitHub: <a class="contact-link" href="https://github.com/hoangan615" target="_blank" rel="noopener noreferrer">hoangan615</a></li>
-                </ul>
-              </article>
-
-              <article class="contact-card">
+          <div class="contact-grid contact-grid-single">
+            <div class="contact-card-grid">
+              <article class="contact-card contact-card-feature">
                 <h3>Preferred opportunities</h3>
+                <p class="contact-copy">
+                  Open to senior individual-contributor and delivery leadership roles where architecture ownership,
+                  product execution, and clear client communication all matter.
+                </p>
                 <ul class="contact-list">
                   <li>Senior Full-Stack Engineer</li>
                   <li>Technical Lead or Engineering Lead</li>
@@ -567,40 +528,49 @@
                   <li>Remote worldwide, hybrid, or Cần Thơ-based opportunities</li>
                 </ul>
               </article>
+
+              <article class="contact-card contact-card-feature">
+                <h3>Contact information</h3>
+                <ul class="contact-detail-list">
+                  <li>
+                    <span>Email</span>
+                    <a class="contact-link" href="mailto:hoangan615@gmail.com">hoangan615@gmail.com</a>
+                  </li>
+                  <li>
+                    <span>Location</span>
+                    <strong>Cần Thơ, Vietnam</strong>
+                  </li>
+                  <li>
+                    <span>LinkedIn</span>
+                    <a
+                      class="contact-link"
+                      href="https://www.linkedin.com/in/an-vo-012359159/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      an-vo-012359159
+                    </a>
+                  </li>
+                  <li>
+                    <span>GitHub</span>
+                    <a class="contact-link" href="https://github.com/hoangan615" target="_blank" rel="noopener noreferrer">
+                      hoangan615
+                    </a>
+                  </li>
+                  <li>
+                    <span>TikTok</span>
+                    <a
+                      class="contact-link"
+                      href="https://www.tiktok.com/@tech.takeaway"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      @tech.takeaway
+                    </a>
+                  </li>
+                </ul>
+              </article>
             </div>
-
-            <form class="contact-form" data-contact-form>
-              <div class="form-grid">
-                <div class="field">
-                  <label for="name">Name</label>
-                  <input id="name" name="name" type="text" placeholder="Your name" required />
-                </div>
-                <div class="field">
-                  <label for="email">Email</label>
-                  <input id="email" name="email" type="email" placeholder="you@example.com" required />
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="subject">Subject</label>
-                <input id="subject" name="subject" type="text" placeholder="Job opportunity, project collaboration..." />
-              </div>
-
-              <div class="field">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" placeholder="Tell me about your project or role..." required></textarea>
-              </div>
-
-              <button class="button" type="submit">Open Email Draft</button>
-              <p class="form-note">
-                Clicking this button opens your default email app and fills in the subject and message using the form
-                content. This keeps the GitHub Pages version fully static.
-              </p>
-              <div class="mailto-fallback" data-mailto-fallback hidden>
-                <strong>If no email app opened:</strong>
-                <a class="contact-link" data-mailto-link href="mailto:hoangan615@gmail.com">Tap here to open the prepared email draft</a>
-              </div>
-            </form>
           </div>
         </div>
       </section>
@@ -617,6 +587,7 @@
           <a href="./cv.html">CV Page</a>
           <a href="mailto:hoangan615@gmail.com">Email</a>
           <a href="https://github.com/hoangan615" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://www.tiktok.com/@tech.takeaway" target="_blank" rel="noopener noreferrer">TikTok</a>
           <span>Copyright <span data-year></span></span>
         </div>
       </div>
