@@ -1,5 +1,6 @@
 .PHONY: dev build down logs migrate seed shell-api shell-db shell-worker \
-        ps restart pull lint test clean help
+        ps restart pull lint test test-api test-api-cov test-web test-web-cov \
+        test-worker clean help
 
 # ── Docker Compose shortcuts ───────────────────────────────────────────────────
 
@@ -102,13 +103,28 @@ shell-minio:
 
 # ── Development utilities ──────────────────────────────────────────────────────
 
-## Run API tests
-test:
+## Run all tests (API + frontend + worker)
+test: test-api test-web test-worker
+
+## Run backend (pytest) tests
+test-api:
 	docker compose exec api pytest tests/ -v --tb=short
 
-## Run API tests with coverage
-test-cov:
+## Run backend tests with coverage report
+test-api-cov:
 	docker compose exec api pytest tests/ --cov=. --cov-report=html --cov-report=term
+
+## Run frontend (vitest) tests inside the web container
+test-web:
+	docker compose exec web pnpm test
+
+## Run frontend tests with coverage
+test-web-cov:
+	docker compose exec web pnpm test:coverage
+
+## Run worker unit tests (no live FFmpeg / Redis required)
+test-worker:
+	docker compose exec worker python -m pytest tests/ -v --tb=short
 
 ## Lint Python code (ruff + black check)
 lint:
