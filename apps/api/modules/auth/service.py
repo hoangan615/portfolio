@@ -509,7 +509,7 @@ async def create_owner_if_not_exists(db: AsyncSession) -> User | None:
         username=settings.OWNER_USERNAME,
         email=settings.OWNER_EMAIL,
         password_hash=hash_password(settings.OWNER_PASSWORD),
-        display_name="Võ Hoàng An",
+        display_name="Võ Hoàng Ân",
         role="owner",
         status="active",
         email_verified=True,

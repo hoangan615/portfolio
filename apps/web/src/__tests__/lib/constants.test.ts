@@ -35,6 +35,7 @@ describe('ROUTES', () => {
     expect(ROUTES.register).toBe('/register')
     expect(ROUTES.settings).toBe('/settings')
     expect(ROUTES.admin).toBe('/admin')
+    expect(ROUTES.cv).toBe('/cv')
   })
 
   it('dynamic routes include the id/slug', () => {

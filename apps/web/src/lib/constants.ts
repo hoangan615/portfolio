@@ -54,6 +54,7 @@ export const ROUTES = {
   admin: '/admin',
   dashboardPosts: '/dashboard/posts',
   dashboardVideos: '/dashboard/videos',
+  cv: '/cv',
 } as const
 
 export const PAGINATION = {
