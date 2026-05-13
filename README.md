@@ -8,6 +8,8 @@
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis)](https://redis.io)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://docker.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://typescriptlang.org)
+[![Tests](https://img.shields.io/badge/tests-328%20passed-brightgreen)](apps/api/tests/)
+[![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)](apps/api/htmlcov/)
 
 ---
 
@@ -126,6 +128,47 @@ portfolio/
 ```
 
 ---
+
+## Testing
+
+Tests run locally without Docker — SQLite + aiosqlite replaces PostgreSQL automatically.
+
+```bash
+# Run all backend tests
+make test-local
+
+# With coverage report (HTML + terminal)
+make test-local-cov
+# Open apps/api/htmlcov/index.html in browser
+
+# Run frontend tests
+make test-web-local
+```
+
+### Backend test coverage
+
+| Module | Tests | Coverage |
+|--------|-------|----------|
+| **Overall** | **328 tests** | **90%** |
+| `core/security` | JWT, password hashing | 100% |
+| `modules/auth` | register, login, refresh, logout, email verify, reset password | 95%+ |
+| `modules/users` | profile, follow/unfollow, settings, account management | 95%+ |
+| `modules/portfolio` | skills, experience, projects, contact | 95%+ |
+| `modules/posts` | CRUD, slug dedup, submit for review | 95%+ |
+| `modules/comments` | create, update, delete (owner + moderator), nested replies | 95%+ |
+| `modules/reactions` | reactions, bookmarks, summary | 100% |
+| `modules/notifications` | list, unread count, mark read | 95%+ |
+| `modules/moderation` | reports, actions, warnings | 95%+ |
+| `modules/feed` | global, following, trending, explore feeds | 90%+ |
+| `modules/videos` | upload init, CRUD, view count | 90%+ |
+| `modules/media` | image upload (PIL processing), delete | 90%+ |
+| `modules/analytics` | record view, summary | 90%+ |
+| `modules/search` | query validation, type filters | 100% |
+| `shared/pagination` | PageParams, PagedResponse, CursorResponse | 97% |
+| `shared/exceptions` | all HTTP exception types | 88% |
+
+Tests use **SQLite + aiosqlite** in-memory — no Docker, no PostgreSQL, no Redis required.
+PostgreSQL-specific features (full-text search) are mocked at the service layer.
 
 ## Documentation
 
