@@ -126,21 +126,21 @@ async def test_login_nonexistent_email(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_login_banned_user(client: AsyncClient, db_session: AsyncSession):
-    banned = User(
-        username="bannedguy",
-        email="banned@example.com",
+async def test_login_suspended_user(client: AsyncClient, db_session: AsyncSession):
+    suspended = User(
+        username="suspendedguy",
+        email="suspended@example.com",
         password_hash=hash_password("Password123!"),
         role="member",
-        status="banned",
+        status="suspended",
         email_verified=True,
     )
-    db_session.add(banned)
+    db_session.add(suspended)
     await db_session.flush()
 
     response = await client.post(
         "/api/v1/auth/login",
-        json={"email": "banned@example.com", "password": "Password123!"},
+        json={"email": "suspended@example.com", "password": "Password123!"},
     )
     assert response.status_code == 401
 

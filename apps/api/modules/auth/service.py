@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from uuid import UUID
 
 import httpx
@@ -101,8 +101,8 @@ async def login(db: AsyncSession, schema: LoginRequest) -> TokenResponse:
     if not user or not user.password_hash or not verify_password(schema.password, user.password_hash):
         raise UnauthorizedError("Invalid email or password")
 
-    if user.status == "banned":
-        raise UnauthorizedError("Account is banned")
+    if user.status == "suspended":
+        raise UnauthorizedError("Account is suspended")
     if user.status == "deleted":
         raise UnauthorizedError("Account not found")
 
@@ -133,7 +133,10 @@ async def refresh_tokens(db: AsyncSession, refresh_token: str) -> TokenResponse:
     if not stored:
         raise UnauthorizedError("Refresh token not found or revoked")
 
-    if stored.expires_at < datetime.now(UTC):
+    expires_at = stored.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(UTC):
         raise UnauthorizedError("Refresh token expired")
 
     # Rotate: revoke old, issue new
@@ -509,7 +512,7 @@ async def create_owner_if_not_exists(db: AsyncSession) -> User | None:
         username=settings.OWNER_USERNAME,
         email=settings.OWNER_EMAIL,
         password_hash=hash_password(settings.OWNER_PASSWORD),
-        display_name="Võ Hoàng An",
+        display_name="Võ Hoàng Ân",
         role="owner",
         status="active",
         email_verified=True,

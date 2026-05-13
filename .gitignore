@@ -182,6 +182,8 @@ Thumbs.db
 coverage.xml
 *.cover
 junit.xml
+htmlcov/
+*.db
 
 # Turbo
 .turbo/

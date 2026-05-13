@@ -1,0 +1,18 @@
+[run]
+source = .
+omit =
+    tests/*
+    seed.py
+    alembic/*
+    */__init__.py
+    */migrations/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    raise NotImplementedError
+    \.\.\.
+
+[html]
+directory = htmlcov
