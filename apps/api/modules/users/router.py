@@ -32,7 +32,7 @@ async def update_me(
 async def upload_avatar(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
-    db: DBDep = Depends(),
+    db: DBDep = None,  # type: ignore[assignment]
 ):
     if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
         raise BadRequestError("Only JPEG, PNG, and WebP images allowed")
@@ -45,7 +45,7 @@ async def upload_avatar(
 async def upload_cover(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
-    db: DBDep = Depends(),
+    db: DBDep = None,  # type: ignore[assignment]
 ):
     if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
         raise BadRequestError("Only JPEG, PNG, and WebP images allowed")

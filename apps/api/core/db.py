@@ -22,11 +22,14 @@ class Base(DeclarativeBase):
 
 
 def _build_engine(url: str, *, testing: bool = False) -> AsyncEngine:
+    is_sqlite = url.startswith("sqlite")
     kwargs: dict = {
         "echo": settings.DEBUG,
         "future": True,
     }
-    if testing:
+    if testing or is_sqlite:
+        # NullPool avoids connection-sharing issues in tests and is
+        # required for SQLite in-memory databases.
         kwargs["poolclass"] = NullPool
     else:
         kwargs["pool_size"] = settings.DATABASE_POOL_SIZE

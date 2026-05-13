@@ -152,14 +152,15 @@ async def test_create_experience(
             "company": "Acme Corp",
             "title": "Engineer",
             "start_date": "2022-01",
-            "is_current": True,
+            # no end_date → current role
         },
         headers=auth_headers,
     )
     assert response.status_code == 201
     body = response.json()
     assert body["company"] == "Acme Corp"
-    assert body["is_current"] is True
+    assert body["title"] == "Engineer"
+    assert body["end_date"] is None
 
 
 # ── Projects ──────────────────────────────────────────────────────────────────
@@ -176,14 +177,14 @@ async def test_create_project(
     response = await client.post(
         "/api/v1/portfolio/projects",
         json={
-            "name": "Awesome App",
+            "title": "Awesome App",
             "description": "A great project",
             "tech_stack": "Python, React",
         },
         headers=auth_headers,
     )
     assert response.status_code == 201
-    assert response.json()["name"] == "Awesome App"
+    assert response.json()["title"] == "Awesome App"
 
 
 # ── Contact ───────────────────────────────────────────────────────────────────
@@ -196,7 +197,7 @@ async def test_contact_form(client: AsyncClient):
         json={
             "name": "Visitor",
             "email": "visitor@example.com",
-            "message": "Hello, I would like to connect.",
+            "body": "Hello, I would like to connect with you here.",
         },
     )
     assert response.status_code == 201

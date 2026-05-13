@@ -126,6 +126,22 @@ test-web-cov:
 test-worker:
 	docker compose exec worker python -m pytest tests/ -v --tb=short
 
+## Run backend tests locally (no Docker required — uses SQLite)
+test-local:
+	cd apps/api && python -m pytest tests/ -v --tb=short
+
+## Run backend tests locally with coverage report
+test-local-cov:
+	cd apps/api && python -m pytest tests/ --cov=. --cov-report=html:htmlcov --cov-report=term-missing
+
+## Run frontend tests locally (no Docker required)
+test-web-local:
+	cd apps/web && pnpm test
+
+## Run frontend tests locally with coverage
+test-web-local-cov:
+	cd apps/web && pnpm test:coverage
+
 ## Lint Python code (ruff + black check)
 lint:
 	docker compose exec api ruff check .

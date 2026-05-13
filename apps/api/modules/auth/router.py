@@ -86,7 +86,7 @@ async def logout(
 # ── Verify email ──────────────────────────────────────────────────────────────
 
 @router.get("/verify-email", response_model=schemas.MessageResponse)
-async def verify_email(token: str = Query(...), db: DBDep = Depends()):
+async def verify_email(token: str = Query(...), db: DBDep = None):  # type: ignore[assignment]
     await service.verify_email(db, token)
     return schemas.MessageResponse(message="Email verified successfully.")
 
@@ -120,8 +120,8 @@ async def google_auth():
 async def google_callback(
     code: str = Query(...),
     state: str | None = Query(None),
-    response: Response = Depends(),
-    db: DBDep = Depends(),
+    response: Response = None,  # type: ignore[assignment]
+    db: DBDep = None,  # type: ignore[assignment]
 ):
     tokens = await service.google_oauth_callback(db, code)
     _set_refresh_cookie(response, tokens.refresh_token)
@@ -141,8 +141,8 @@ async def github_auth():
 async def github_callback(
     code: str = Query(...),
     state: str | None = Query(None),
-    response: Response = Depends(),
-    db: DBDep = Depends(),
+    response: Response = None,  # type: ignore[assignment]
+    db: DBDep = None,  # type: ignore[assignment]
 ):
     tokens = await service.github_oauth_callback(db, code)
     _set_refresh_cookie(response, tokens.refresh_token)

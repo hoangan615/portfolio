@@ -1,13 +1,16 @@
 """
-Shared pytest fixtures for the portfolio API test suite.
+Shared pytest fixtures — SQLite+aiosqlite backend (no PostgreSQL/Docker needed).
 
-Database isolation strategy:
-  - Session-scoped: create all tables once, drop them all after the session.
-  - Function-scoped: each test wraps its operations in a SAVEPOINT that is
-    rolled back at teardown, so tests never pollute each other.
+Isolation strategy
+──────────────────
+• session-scoped  : schema is created once before all tests, dropped after.
+• function-scoped : every test gets a fresh AsyncSession; all writes are
+                    rolled back via a SAVEPOINT so tests never share state.
 
-FastAPILimiter (Redis) is disabled via a patched no-op lifespan so tests
-do not require a live Redis connection.
+Redis / FastAPILimiter
+──────────────────────
+The app lifespan is replaced with a no-op context manager so tests never
+attempt to connect to Redis.
 """
 from __future__ import annotations
 
@@ -21,25 +24,20 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-# ── Environment must be set BEFORE any app module is imported ────────────────
-_TEST_DB = os.environ.get(
-    "TEST_DATABASE_URL",
-    os.environ.get(
-        "DATABASE_URL",
-        "postgresql+asyncpg://postgres:password@postgres:5432/portfolio_db",
-    ),
-)
-os.environ["DATABASE_URL"] = _TEST_DB
-os.environ.setdefault("SECRET_KEY", "test-secret-key-for-portfolio-tests-32ch")
-os.environ.setdefault("REDIS_URL", "redis://redis:6379/15")
-os.environ.setdefault("APP_ENV", "test")
+# ── MUST be set before any app module is imported ────────────────────────────
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./portfolio_test.db"
+os.environ["SECRET_KEY"] = "test-secret-key-for-portfolio-tests-32ch"
+os.environ["REDIS_URL"] = "redis://localhost:6379/15"
+os.environ["APP_ENV"] = "test"
+os.environ["CELERY_BROKER_URL"] = "memory://"
+os.environ["CELERY_RESULT_BACKEND"] = "cache+memory://"
 
-# ── App imports (after env is configured) ────────────────────────────────────
+# ── App imports (after env vars are in place) ─────────────────────────────────
 from core.db import Base  # noqa: E402
 from core.security import create_access_token, hash_password  # noqa: E402
 from modules.users.models import User, UserSettings  # noqa: E402, F401
 
-# Register all ORM models so Base.metadata is complete
+# Register every model so Base.metadata is fully populated
 import modules.analytics.models  # noqa: E402, F401
 import modules.comments.models  # noqa: E402, F401
 import modules.media.models  # noqa: E402, F401
@@ -52,8 +50,15 @@ import modules.videos.models  # noqa: E402, F401
 
 from shared.dependencies import get_db  # noqa: E402
 
-# ── Test engine (NullPool → no connection sharing between tests) ─────────────
-_test_engine = create_async_engine(_TEST_DB, poolclass=NullPool, echo=False)
+# ── Dedicated test engine (SQLite) ────────────────────────────────────────────
+TEST_DB_URL = "sqlite+aiosqlite:///./portfolio_test.db"
+
+_test_engine = create_async_engine(
+    TEST_DB_URL,
+    poolclass=NullPool,
+    echo=False,
+    connect_args={"check_same_thread": False},
+)
 _TestSession = async_sessionmaker(
     bind=_test_engine,
     class_=AsyncSession,
@@ -63,38 +68,30 @@ _TestSession = async_sessionmaker(
 )
 
 
-# ── Schema lifecycle ──────────────────────────────────────────────────────────
-
+# ── Schema lifecycle (once per test session) ──────────────────────────────────
 
 @pytest.fixture(scope="session", autouse=True)
 async def create_tables():
-    """Create schema once before all tests; drop after the session."""
     async with _test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
     yield
     async with _test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
     await _test_engine.dispose()
 
 
-# ── Per-test database session (rolled-back after each test) ──────────────────
-
+# ── Per-test session (rolled back) ────────────────────────────────────────────
 
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
-    """Yields an AsyncSession; all writes are rolled back after the test."""
-    async with _test_engine.connect() as conn:
-        await conn.begin()
-        session = AsyncSession(bind=conn, expire_on_commit=False)
-        try:
-            yield session
-        finally:
-            await session.close()
-            await conn.rollback()
+    """Each test gets its own session; everything is rolled back on teardown."""
+    async with _TestSession() as session:
+        yield session
+        await session.rollback()
 
 
-# ── No-op lifespan (skips FastAPILimiter / Redis init) ───────────────────────
-
+# ── No-op lifespan (skips Redis / FastAPILimiter) ────────────────────────────
 
 @asynccontextmanager
 async def _noop_lifespan(app):  # type: ignore[type-arg]
@@ -103,13 +100,10 @@ async def _noop_lifespan(app):  # type: ignore[type-arg]
 
 # ── FastAPI test application ──────────────────────────────────────────────────
 
-
 @pytest.fixture
 def test_app(db_session: AsyncSession):
-    """FastAPI app with test DB and no rate limiting."""
     with patch("main.lifespan", _noop_lifespan):
         from main import create_application
-
         application = create_application()
 
     async def _override_db() -> AsyncGenerator[AsyncSession, None]:
@@ -119,8 +113,7 @@ def test_app(db_session: AsyncSession):
     return application
 
 
-# ── HTTP client ───────────────────────────────────────────────────────────────
-
+# ── Async HTTP client ─────────────────────────────────────────────────────────
 
 @pytest.fixture
 async def client(test_app) -> AsyncGenerator[AsyncClient, None]:
@@ -131,7 +124,6 @@ async def client(test_app) -> AsyncGenerator[AsyncClient, None]:
 
 
 # ── User fixtures ─────────────────────────────────────────────────────────────
-
 
 @pytest.fixture
 async def regular_user(db_session: AsyncSession) -> User:
@@ -190,8 +182,7 @@ async def admin_user(db_session: AsyncSession) -> User:
     return user
 
 
-# ── Auth header helpers ───────────────────────────────────────────────────────
-
+# ── Auth helpers ──────────────────────────────────────────────────────────────
 
 @pytest.fixture
 def user_token(regular_user: User) -> str:

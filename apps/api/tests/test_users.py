@@ -91,8 +91,9 @@ async def test_follow_user(
     second_user: User,
     auth_headers: dict,
 ):
+    # Follow endpoints use UUID, not username
     response = await client.post(
-        f"/api/v1/users/{second_user.username}/follow",
+        f"/api/v1/users/{second_user.id}/follow",
         headers=auth_headers,
     )
     assert response.status_code in (200, 201, 204)
@@ -105,7 +106,7 @@ async def test_cannot_follow_self(
     auth_headers: dict,
 ):
     response = await client.post(
-        f"/api/v1/users/{regular_user.username}/follow",
+        f"/api/v1/users/{regular_user.id}/follow",
         headers=auth_headers,
     )
     assert response.status_code in (400, 409)
@@ -119,13 +120,12 @@ async def test_unfollow_user(
     db_session: AsyncSession,
     auth_headers: dict,
 ):
-    # Manually create follow relationship
     follow = Follow(follower_id=regular_user.id, following_id=second_user.id)
     db_session.add(follow)
     await db_session.flush()
 
     response = await client.delete(
-        f"/api/v1/users/{second_user.username}/follow",
+        f"/api/v1/users/{second_user.id}/follow",
         headers=auth_headers,
     )
     assert response.status_code in (200, 204)
@@ -133,7 +133,7 @@ async def test_unfollow_user(
 
 @pytest.mark.asyncio
 async def test_follow_requires_auth(client: AsyncClient, second_user: User):
-    response = await client.post(f"/api/v1/users/{second_user.username}/follow")
+    response = await client.post(f"/api/v1/users/{second_user.id}/follow")
     assert response.status_code == 401
 
 
