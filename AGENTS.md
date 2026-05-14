@@ -1,9 +1,9 @@
 # Portfolio Platform — Codex Context
 
 ## Project Overview
-Community platform monorepo: **Portfolio** (Võ Hoàng An) + **Tech Takeaway** community.
+Community platform monorepo: **Portfolio** (Võ Hoàng Ân) + **Tech Takeaway** community.
 
-- Owner: Võ Hoàng An | GitHub: [hoangan615](https://github.com/hoangan615)
+- Owner: Võ Hoàng Ân | GitHub: [hoangan615](https://github.com/hoangan615)
 - Platform: Full-Stack community sharing knowledge — posts, videos, comments, follow system
 - Backend: FastAPI (Python) | Frontend: React (TypeScript) | DB: PostgreSQL + Redis + MinIO
 
@@ -97,7 +97,7 @@ apps/web/src/
 ## Routes
 | URL | Page |
 |-----|------|
-| `/` | Portfolio (Võ Hoàng An's personal page) |
+| `/` | Portfolio (Võ Hoàng Ân's personal page) |
 | `/community` | Tech Takeaway community feed |
 | `/watch/:id` | Video watch page (HLS player) |
 | `/post/:slug` | Blog post detail |

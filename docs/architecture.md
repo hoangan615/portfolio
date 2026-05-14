@@ -3,7 +3,7 @@
 ## Overview
 
 A **monorepo community platform** combining:
-1. **Portfolio** — Võ Hoàng An's personal portfolio page (owner-only editable)
+1. **Portfolio** — Võ Hoàng Ân's personal portfolio page (owner-only editable)
 2. **Tech Takeaway** — Open knowledge-sharing community (user-generated content)
 
 ---
