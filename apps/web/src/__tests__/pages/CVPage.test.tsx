@@ -23,7 +23,9 @@ describe('CVPage', () => {
 
   it('renders current role / company', () => {
     renderCVPage()
-    expect(screen.getByText(/FPT Software/i)).toBeInTheDocument()
+    // FPT Software appears in multiple places (role title + bio text)
+    const matches = screen.getAllByText(/FPT Software/i)
+    expect(matches.length).toBeGreaterThan(0)
   })
 
   it('renders contact email', () => {
@@ -45,14 +47,14 @@ describe('CVPage', () => {
 
   it('renders skills section', () => {
     renderCVPage()
-    // Skills section heading
-    expect(screen.getByText(/skills/i)).toBeInTheDocument()
+    // Section heading is "Technical Skills"
+    expect(screen.getByText(/Technical Skills/i)).toBeInTheDocument()
   })
 
   it('has a print button', () => {
     renderCVPage()
-    // The print button contains the text "Print" or an aria-label
-    const printBtn = screen.getByRole('button', { name: /print/i })
+    // Button text is "Save as PDF"
+    const printBtn = screen.getByRole('button', { name: /save as pdf/i })
     expect(printBtn).toBeInTheDocument()
   })
 

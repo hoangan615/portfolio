@@ -1,6 +1,6 @@
 # Portfolio & Tech Takeaway
 
-> Personal portfolio + open community platform — by **Võ Hoàng An**
+> Personal portfolio + open community platform — by **Võ Hoàng Ân**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev)
@@ -19,7 +19,7 @@ This project has two main spaces:
 
 | Space | URL | Description |
 |-------|-----|-------------|
-| **Portfolio** | `/` | Võ Hoàng An's personal page — skills, experience, projects |
+| **Portfolio** | `/` | Võ Hoàng Ân's personal page — skills, experience, projects |
 | **Tech Takeaway** | `/community` | Open community — posts, videos, comments, follow |
 
 ---
@@ -183,17 +183,17 @@ PostgreSQL-specific features (full-text search) are mocked at the service layer.
 
 ## Author
 
-**Võ Hoàng An** — Full-Stack Developer & Tech Lead at FPT Software
+**Võ Hoàng Ân** — Full-Stack Developer & Tech Lead at FPT Software
 
 - 9 years web development (.NET/C#, ReactJS, Angular)
 - 5 years mobile development (React Native)
 - Domain experience: E-commerce, Logistics, Loyalty, Healthcare, Real Estate
 
 [![GitHub](https://img.shields.io/badge/GitHub-hoangan615-181717?logo=github)](https://github.com/hoangan615)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-hoangan615-0077B5?logo=linkedin)](https://linkedin.com/in/hoangan615)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-hoangan615-0077B5?logo=linkedin)](https://linkedin.com/in/an-vo-012359159)
 
 ---
 
 ## License
 
-MIT © 2026 Võ Hoàng An
+MIT © 2026 Võ Hoàng Ân

@@ -11,6 +11,7 @@ import {
   buildQueryString,
   isValidEmail,
   debounce,
+  getAvatarUrl,
 } from '@/lib/utils'
 
 // ── cn (class merging) ────────────────────────────────────────────────────────
@@ -219,5 +220,30 @@ describe('debounce', () => {
     expect(fn).toHaveBeenCalledOnce()
 
     vi.useRealTimers()
+  })
+})
+
+// ── getAvatarUrl ──────────────────────────────────────────────────────────────
+
+describe('getAvatarUrl', () => {
+  it('returns a URL string containing the username', () => {
+    const url = getAvatarUrl('johndoe')
+    expect(url).toContain('johndoe')
+    expect(url).toContain('dicebear')
+  })
+
+  it('uses default size 40 when not specified', () => {
+    const url = getAvatarUrl('alice')
+    expect(url).toContain('size=40')
+  })
+
+  it('uses custom size when provided', () => {
+    const url = getAvatarUrl('alice', 80)
+    expect(url).toContain('size=80')
+  })
+
+  it('URL-encodes the username', () => {
+    const url = getAvatarUrl('john doe')
+    expect(url).toContain('john%20doe')
   })
 })
