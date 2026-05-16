@@ -6,8 +6,6 @@ import {
   FileText,
   Trash2,
   Eye,
-  Heart,
-  MessageCircle,
   Search,
   Pencil,
 } from 'lucide-react'
@@ -68,7 +66,7 @@ export default function DashboardPostsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: [...QUERY_KEYS.posts, 'mine'],
-    queryFn: () => postsApi.list({ authorId: user?.id, limit: 100 }),
+    queryFn: () => postsApi.listMine({ pageSize: 100 }),
     enabled: !!user,
   })
 
@@ -81,8 +79,8 @@ export default function DashboardPostsPage() {
     onError: () => toast.error('Failed to delete post'),
   })
 
-  const posts = (data?.data ?? [] as DashboardPost[]).filter((p) =>
-    search ? p.title.toLowerCase().includes(search.toLowerCase()) : true
+  const posts = (data?.items ?? [] as DashboardPost[]).filter((p) =>
+    search ? (p.title ?? '').toLowerCase().includes(search.toLowerCase()) : true
   )
 
   return (
@@ -94,7 +92,7 @@ export default function DashboardPostsPage() {
             My Posts
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {data?.meta.total ?? 0} posts total
+            {data?.total ?? 0} posts total
           </p>
         </div>
         <Button onClick={() => navigate('/post/new')} className="gap-2">
@@ -166,15 +164,7 @@ export default function DashboardPostsPage() {
                     <StatusBadge status={status} />
                     <span className="flex items-center gap-1">
                       <Eye className="h-3 w-3" />
-                      {formatNumber(post.viewsCount)}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Heart className="h-3 w-3" />
-                      {formatNumber(post.likesCount)}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MessageCircle className="h-3 w-3" />
-                      {formatNumber(post.commentsCount)}
+                      {formatNumber(post.viewCount)}
                     </span>
                     <span>{formatRelativeTime(post.createdAt)}</span>
                   </div>
@@ -188,7 +178,7 @@ export default function DashboardPostsPage() {
                 {/* Views — desktop */}
                 <div className="hidden md:flex items-center gap-1 text-sm text-muted-foreground">
                   <Eye className="h-3.5 w-3.5" />
-                  {formatNumber(post.viewsCount)}
+                  {formatNumber(post.viewCount)}
                 </div>
 
                 {/* Date — desktop */}

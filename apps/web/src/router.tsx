@@ -20,6 +20,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 const DashboardPostsPage = lazy(() => import('@/pages/DashboardPostsPage'))
 const DashboardVideosPage = lazy(() => import('@/pages/DashboardVideosPage'))
+const CreateEditPostPage = lazy(() => import('@/pages/CreateEditPostPage'))
 const CVPage = lazy(() => import('@/pages/CVPage'))
 
 function PageLoader() {
@@ -107,6 +108,8 @@ export const router = createBrowserRouter([
           { path: '/settings', element: <SettingsPage /> },
           { path: '/dashboard/posts', element: <DashboardPostsPage /> },
           { path: '/dashboard/videos', element: <DashboardVideosPage /> },
+          { path: '/post/new', element: <CreateEditPostPage /> },
+          { path: '/post/:slug/edit', element: <CreateEditPostPage /> },
         ],
       },
       {
