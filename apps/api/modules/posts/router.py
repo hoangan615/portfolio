@@ -14,6 +14,12 @@ MemberRequired = require_min_role("member")
 ModeratorRequired = require_min_role("moderator")
 
 
+@router.get("/mine", response_model=PagedResponse[schemas.PostOut], dependencies=[MemberRequired])
+async def list_my_posts(db: DBDep, current_user: CurrentUser, params: PageParams = Depends()):
+    posts, total = await service.list_posts(db, params, status=None, user_id=current_user.id)  # type: ignore[union-attr]
+    return PagedResponse.create(posts, total, params)
+
+
 @router.get("", response_model=PagedResponse[schemas.PostOut])
 async def list_posts(
     db: DBDep,
