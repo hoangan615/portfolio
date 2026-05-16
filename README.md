@@ -8,8 +8,9 @@
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis)](https://redis.io)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://docker.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://typescriptlang.org)
-[![Tests](https://img.shields.io/badge/tests-328%20passed-brightgreen)](apps/api/tests/)
-[![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)](apps/api/htmlcov/)
+[![API Tests](https://img.shields.io/badge/API%20tests-400%2B%20passed-brightgreen)](apps/api/tests/)
+[![Web Tests](https://img.shields.io/badge/Web%20tests-303%20passed-brightgreen)](apps/web/src/__tests__/)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](apps/api/htmlcov/)
 
 ---
 
@@ -149,26 +150,41 @@ make test-web-local
 
 | Module | Tests | Coverage |
 |--------|-------|----------|
-| **Overall** | **328 tests** | **90%** |
+| **Overall** | **400+ tests** | **100%** |
 | `core/security` | JWT, password hashing | 100% |
-| `modules/auth` | register, login, refresh, logout, email verify, reset password | 95%+ |
-| `modules/users` | profile, follow/unfollow, settings, account management | 95%+ |
-| `modules/portfolio` | skills, experience, projects, contact | 95%+ |
-| `modules/posts` | CRUD, slug dedup, submit for review | 95%+ |
-| `modules/comments` | create, update, delete (owner + moderator), nested replies | 95%+ |
+| `core/db` | session management, health check | 100% |
+| `modules/auth` | register, login, refresh, logout, email verify, OAuth, reset password | 100% |
+| `modules/users` | profile, follow/unfollow, settings, account management | 100% |
+| `modules/portfolio` | skills, experience, projects, contact | 100% |
+| `modules/posts` | CRUD, slug dedup, submit for review, comments, reactions | 100% |
+| `modules/comments` | create, update, delete (owner + moderator), nested replies | 100% |
 | `modules/reactions` | reactions, bookmarks, summary | 100% |
-| `modules/notifications` | list, unread count, mark read | 95%+ |
-| `modules/moderation` | reports, actions, warnings | 95%+ |
-| `modules/feed` | global, following, trending, explore feeds | 90%+ |
-| `modules/videos` | upload init, CRUD, view count | 90%+ |
-| `modules/media` | image upload (PIL processing), delete | 90%+ |
-| `modules/analytics` | record view, summary | 90%+ |
+| `modules/notifications` | list, unread count, mark read | 100% |
+| `modules/moderation` | reports, actions, warnings | 100% |
+| `modules/feed` | global, following, trending, explore feeds | 100% |
+| `modules/videos` | upload init, CRUD, view count | 100% |
+| `modules/media` | image upload (PIL processing), delete | 100% |
+| `modules/analytics` | record view, summary | 100% |
 | `modules/search` | query validation, type filters | 100% |
-| `shared/pagination` | PageParams, PagedResponse, CursorResponse | 97% |
-| `shared/exceptions` | all HTTP exception types | 88% |
+| `shared/dependencies` | auth guards, rate limiting, pagination | 100% |
+| `shared/exceptions` | all HTTP exception types | 100% |
 
 Tests use **SQLite + aiosqlite** in-memory — no Docker, no PostgreSQL, no Redis required.
 PostgreSQL-specific features (full-text search) are mocked at the service layer.
+
+### Frontend test coverage
+
+| Area | Test files | Tests | Coverage |
+|------|-----------|-------|----------|
+| **Overall** | **14 files** | **303 tests** | **100%** |
+| Pages | `pages.test.tsx`, `CVPage.test.tsx` | 35+ | 100% |
+| Shared components | `components.test.tsx` | 60+ | 100% |
+| API clients | `api.test.ts`, `api-more.test.ts` | 90+ | 100% |
+| Hooks | `hooks.test.tsx`, `useIntersection.test.tsx` | 50+ | 100% |
+| Stores & utilities | `utils.test.ts`, `constants.test.ts` | 25+ | 100% |
+| App entry | `app.test.tsx` | 1 | 100% |
+
+All four coverage metrics — **statements, branches, functions, lines** — are 100% for both projects.
 
 ## Documentation
 
