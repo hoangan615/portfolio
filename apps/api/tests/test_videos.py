@@ -171,3 +171,23 @@ async def test_init_upload_requires_auth(client: AsyncClient):
         json={"title": "Fail", "filename": "test.mp4"},
     )
     assert response.status_code == 401
+
+
+# ── GET /videos/upload/{video_id}/status ──────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_get_upload_status(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    video = await _create_video(db_session, regular_user)
+    response = await client.get(
+        f"/api/v1/videos/upload/{video.id}/status",
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert "status" in body

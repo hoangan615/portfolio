@@ -5,6 +5,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from shared.pagination import PageParams
 
 
 def _mock_search_response(query: str = "test") -> dict:
@@ -70,3 +73,19 @@ async def test_search_pagination(client: AsyncClient):
     with patch("modules.search.service.search", new=AsyncMock(return_value=mock_result)):
         response = await client.get("/api/v1/search?q=code&page=2&page_size=10")
     assert response.status_code == 200
+
+
+# ── search service direct (empty query) ───────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_search_service_empty_query(db_session: AsyncSession):
+    from modules.search.service import search
+
+    p = PageParams.__new__(PageParams)
+    p.page = 1
+    p.page_size = 20
+    result = await search(db_session, "", None, p)
+    assert result.total_posts == 0
+    assert result.total_users == 0
+    assert result.query == ""

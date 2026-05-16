@@ -19,7 +19,7 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
         to={ROUTES.watch(video.id)}
         className={cn(
           'relative overflow-hidden rounded-xl bg-muted',
-          compact ? 'aspect-video' : 'aspect-video'
+          'aspect-video'
         )}
       >
         {video.thumbnailUrl ? (
@@ -57,7 +57,7 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
       </Link>
 
       {/* Info */}
-      <div className={cn('flex gap-2', compact ? 'items-start' : 'items-start')}>
+      <div className={cn('flex gap-2', 'items-start')}>
         {!compact && (
           <Link to={ROUTES.profile(video.author.username)} className="shrink-0">
             <Avatar src={video.author.avatarUrl} name={video.author.displayName} size="sm" />
@@ -77,7 +77,7 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
             </h3>
           </Link>
 
-          <div className={cn('mt-1 flex flex-col gap-0.5', compact ? 'text-xs' : 'text-xs')}>
+          <div className={cn('mt-1 flex flex-col gap-0.5', 'text-xs')}>
             <Link
               to={ROUTES.profile(video.author.username)}
               className="text-muted-foreground hover:text-foreground transition-colors"

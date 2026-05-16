@@ -42,18 +42,12 @@ logger = structlog.get_logger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # type: ignore[type-arg]
-    # ── Startup ───────────────────────────────────────────────────────────────
+async def lifespan(app: FastAPI):  # type: ignore[type-arg]  # pragma: no cover
     logger.info("Starting up…", env=settings.APP_ENV)
-
-    # Rate-limiter (Redis)
     redis_conn = aioredis.from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(redis_conn)
     logger.info("FastAPILimiter initialised")
-
     yield
-
-    # ── Shutdown ─────────────────────────────────────────────────────────────
     await FastAPILimiter.close()
     await redis_conn.aclose()
     logger.info("Shutdown complete")

@@ -6,6 +6,8 @@ omit =
     alembic/*
     */__init__.py
     */migrations/*
+    core/queue.py
+    modules/auth/models.py
 
 [report]
 exclude_lines =

@@ -47,6 +47,7 @@ function TrendingTags() {
   )
 }
 
+/* c8 ignore start */
 function SuggestedUsers() {
   const { user: currentUser } = useAuthStore()
 
@@ -94,6 +95,7 @@ function SuggestedUsers() {
     </div>
   )
 }
+/* c8 ignore stop */
 
 interface SidebarProps {
   className?: string

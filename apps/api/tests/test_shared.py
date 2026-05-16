@@ -7,8 +7,11 @@ from shared.exceptions import (
     BadRequestError,
     ConflictError,
     ForbiddenError,
+    InternalError,
     NotFoundError,
+    TooManyRequestsError,
     UnauthorizedError,
+    UnprocessableError,
 )
 from shared.pagination import CursorParams, CursorResponse, PageParams
 
@@ -164,6 +167,99 @@ def test_conflict_error():
 def test_bad_request_error():
     exc = BadRequestError("Invalid input")
     assert exc.status_code == 400
+
+
+def test_unprocessable_error():
+    exc = UnprocessableError("bad data")
+    assert exc.status_code == 422
+
+
+def test_too_many_requests_error():
+    exc = TooManyRequestsError()
+    assert exc.status_code == 429
+
+
+def test_internal_error():
+    exc = InternalError()
+    assert exc.status_code == 500
+
+
+# ── CursorParams init ─────────────────────────────────────────────────────────
+
+
+def test_cursor_params_init_sets_attrs():
+    cp = CursorParams(cursor=None, limit=15)
+    assert cp.cursor is None
+    assert cp.limit == 15
+
+
+# ── Config validator ──────────────────────────────────────────────────────────
+
+
+def test_config_parse_allowed_hosts_json_string():
+    from core.config import Settings
+    result = Settings.parse_allowed_hosts('["localhost", "example.com"]')
+    assert result == ["localhost", "example.com"]
+
+
+def test_config_parse_allowed_hosts_comma_separated():
+    from core.config import Settings
+    result = Settings.parse_allowed_hosts("localhost, example.com")
+    assert result == ["localhost", "example.com"]
+
+
+def test_config_parse_allowed_hosts_list_passthrough():
+    from core.config import Settings
+    result = Settings.parse_allowed_hosts(["localhost"])
+    assert result == ["localhost"]
+
+
+# ── StorageClient.get_url ─────────────────────────────────────────────────────
+
+
+def test_storage_get_url():
+    from core.storage import StorageClient
+    client = StorageClient.__new__(StorageClient)
+    client.public_url = "https://cdn.example.com"
+    assert client.get_url("media/test.jpg") == "https://cdn.example.com/media/test.jpg"
+
+
+def test_storage_build_key_with_user():
+    from core.storage import StorageClient
+    key = StorageClient.build_key("media/original", "photo.jpg", "user-123")
+    assert key.startswith("media/original/user-123/")
+    assert "photo" in key
+    assert key.endswith(".jpg")
+
+
+def test_storage_build_key_without_user():
+    from core.storage import StorageClient
+    key = StorageClient.build_key("media/original", "photo.jpg")
+    assert key.startswith("media/original/")
+    assert "photo" in key
+
+
+def test_storage_delete_objects_empty_keys():
+    from core.storage import StorageClient
+    client = StorageClient.__new__(StorageClient)
+    # Should return immediately without error when keys is empty
+    client.delete_objects([])
+
+
+# ── UserUpdateSchema URL validator ────────────────────────────────────────────
+
+
+def test_user_update_schema_valid_url():
+    from modules.users.schemas import UserUpdate
+    schema = UserUpdate(website_url="https://example.com")
+    assert schema.website_url == "https://example.com"
+
+
+def test_user_update_schema_invalid_url():
+    from pydantic import ValidationError
+    from modules.users.schemas import UserUpdate
+    with pytest.raises(ValidationError):
+        UserUpdate(website_url="not-a-url")
 
 
 # ── Dependencies: ROLE_HIERARCHY ──────────────────────────────────────────────

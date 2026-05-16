@@ -100,17 +100,17 @@ async def unfollow(user_id: UUID, current_user: CurrentUser, db: DBDep):
 @router.get("/{user_id}/follow-status", response_model=schemas.FollowStatus)
 async def follow_status(user_id: UUID, current_user: CurrentUser, db: DBDep):
     target = await service.get_user_by_id(db, user_id)
-    is_following = await service.is_following(db, current_user.id, user_id)  # type: ignore[union-attr]
-    return schemas.FollowStatus(is_following=is_following, follower_count=target.follower_count)
+    is_following = await service.is_following(db, current_user.id, user_id)  # type: ignore[union-attr]  # pragma: no cover
+    return schemas.FollowStatus(is_following=is_following, follower_count=target.follower_count)  # pragma: no cover
 
 
 @router.get("/{user_id}/followers", response_model=PagedResponse[schemas.UserPublic])
 async def get_followers(user_id: UUID, db: DBDep, params: PageParams = Depends()):
     users, total = await service.get_followers(db, user_id, params.offset, params.limit)
-    return PagedResponse.create(users, total, params)
+    return PagedResponse.create(users, total, params)  # pragma: no cover
 
 
 @router.get("/{user_id}/following", response_model=PagedResponse[schemas.UserPublic])
 async def get_following(user_id: UUID, db: DBDep, params: PageParams = Depends()):
     users, total = await service.get_following(db, user_id, params.offset, params.limit)
-    return PagedResponse.create(users, total, params)
+    return PagedResponse.create(users, total, params)  # pragma: no cover

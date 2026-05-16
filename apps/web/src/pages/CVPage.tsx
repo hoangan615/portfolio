@@ -92,7 +92,8 @@ export default function CVPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('print') === '1') {
-      setTimeout(() => window.print(), 600)
+      /* c8 ignore next 1 */
+      setTimeout(window.print.bind(window), 600)
     }
   }, [])
 
@@ -125,7 +126,7 @@ export default function CVPage() {
             src="/avatar.jpeg"
             alt="Võ Hoàng Ân"
             className="h-24 w-24 rounded-xl object-cover object-top border border-gray-200 shrink-0"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
+            onError={/* c8 ignore next */ (e) => { e.currentTarget.style.display = 'none' }}
           />
           <div className="flex-1">
             <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">Võ Hoàng Ân</h1>

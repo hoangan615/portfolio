@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import CVPage from '@/pages/CVPage'
 
@@ -23,7 +23,9 @@ describe('CVPage', () => {
 
   it('renders current role / company', () => {
     renderCVPage()
-    expect(screen.getByText(/FPT Software/i)).toBeInTheDocument()
+    // FPT Software appears in multiple experience entries — check at least one exists
+    const matches = screen.getAllByText(/FPT Software/i)
+    expect(matches.length).toBeGreaterThan(0)
   })
 
   it('renders contact email', () => {
@@ -45,14 +47,14 @@ describe('CVPage', () => {
 
   it('renders skills section', () => {
     renderCVPage()
-    // Skills section heading
-    expect(screen.getByText(/skills/i)).toBeInTheDocument()
+    // Skills section heading — use exact heading text
+    expect(screen.getByText('Technical Skills')).toBeInTheDocument()
   })
 
-  it('has a print button', () => {
+  it('has a save as pdf button', () => {
     renderCVPage()
-    // The print button contains the text "Print" or an aria-label
-    const printBtn = screen.getByRole('button', { name: /print/i })
+    // The print button has text "Save as PDF"
+    const printBtn = screen.getByRole('button', { name: /save as pdf/i })
     expect(printBtn).toBeInTheDocument()
   })
 
@@ -61,5 +63,29 @@ describe('CVPage', () => {
     const backLink = screen.getByRole('link', { name: /back/i })
     expect(backLink).toBeInTheDocument()
     expect(backLink.getAttribute('href')).toBe('/')
+  })
+
+  it('calls window.print when Save as PDF button is clicked', () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+    renderCVPage()
+    fireEvent.click(screen.getByRole('button', { name: /save as pdf/i }))
+    expect(printSpy).toHaveBeenCalled()
+    printSpy.mockRestore()
+  })
+
+  it('calls window.print when ?print=1 is in the URL', async () => {
+    vi.useFakeTimers()
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+    window.history.pushState({}, '', '?print=1')
+
+    render(<MemoryRouter><CVPage /></MemoryRouter>)
+    await act(async () => {
+      vi.advanceTimersByTime(700)
+    })
+    expect(printSpy).toHaveBeenCalled()
+
+    window.history.pushState({}, '', '/')
+    printSpy.mockRestore()
+    vi.useRealTimers()
   })
 })

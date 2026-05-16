@@ -11,6 +11,7 @@ import {
   buildQueryString,
   isValidEmail,
   debounce,
+  getAvatarUrl,
 } from '@/lib/utils'
 
 // ── cn (class merging) ────────────────────────────────────────────────────────
@@ -206,6 +207,16 @@ describe('debounce', () => {
     vi.useRealTimers()
   })
 
+  it('passes args to the wrapped function', async () => {
+    vi.useFakeTimers()
+    const fn = vi.fn()
+    const debounced = debounce(fn, 50)
+    debounced('arg1', 'arg2')
+    vi.advanceTimersByTime(50)
+    expect(fn).toHaveBeenCalledWith('arg1', 'arg2')
+    vi.useRealTimers()
+  })
+
   it('calls only once for rapid invocations', async () => {
     vi.useFakeTimers()
     const fn = vi.fn()
@@ -219,5 +230,25 @@ describe('debounce', () => {
     expect(fn).toHaveBeenCalledOnce()
 
     vi.useRealTimers()
+  })
+})
+
+// ── getAvatarUrl ──────────────────────────────────────────────────────────────
+
+describe('getAvatarUrl', () => {
+  it('returns a dicebear URL with the username seed', () => {
+    const url = getAvatarUrl('testuser')
+    expect(url).toContain('testuser')
+    expect(url).toContain('dicebear.com')
+  })
+
+  it('uses custom size', () => {
+    const url = getAvatarUrl('testuser', 80)
+    expect(url).toContain('size=80')
+  })
+
+  it('URL-encodes the username', () => {
+    const url = getAvatarUrl('hello world')
+    expect(url).toContain('hello%20world')
   })
 })
