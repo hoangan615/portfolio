@@ -2,7 +2,6 @@ import { Link } from 'react-router'
 import { Eye, Play } from 'lucide-react'
 import { cn, formatRelativeTime, formatNumber, formatDuration } from '@/lib/utils'
 import { ROUTES } from '@/lib/constants'
-import Avatar from './Avatar'
 import type { Video } from '@/shared/api/videos'
 
 interface VideoCardProps {
@@ -36,9 +35,11 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
         )}
 
         {/* Duration overlay */}
-        <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
-          {formatDuration(video.duration)}
-        </span>
+        {video.durationSeconds != null && (
+          <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
+            {formatDuration(video.durationSeconds)}
+          </span>
+        )}
 
         {/* Play button overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -58,12 +59,6 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
 
       {/* Info */}
       <div className={cn('flex gap-2', 'items-start')}>
-        {!compact && (
-          <Link to={ROUTES.profile(video.author.username)} className="shrink-0">
-            <Avatar src={video.author.avatarUrl} name={video.author.displayName} size="sm" />
-          </Link>
-        )}
-
         <div className="flex-1 min-w-0">
           <Link to={ROUTES.watch(video.id)}>
             <h3
@@ -78,16 +73,10 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
           </Link>
 
           <div className={cn('mt-1 flex flex-col gap-0.5', 'text-xs')}>
-            <Link
-              to={ROUTES.profile(video.author.username)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {video.author.displayName}
-            </Link>
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <span className="flex items-center gap-0.5">
                 <Eye className="h-3 w-3" />
-                {formatNumber(video.views)}
+                {formatNumber(video.viewCount)}
               </span>
               <span>·</span>
               <span>{formatRelativeTime(video.publishedAt || video.createdAt)}</span>

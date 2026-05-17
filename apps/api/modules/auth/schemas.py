@@ -22,6 +22,25 @@ class TokenResponse(BaseModel):
     expires_in: int
 
 
+class LoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    user: "UserPublicInline"
+
+
+class UserPublicInline(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    username: str
+    display_name: str | None
+    avatar_url: str | None
+    role: str
+    email: str
+
+
 class RefreshRequest(BaseModel):
     refresh_token: str
 

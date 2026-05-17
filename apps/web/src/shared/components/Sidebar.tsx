@@ -51,15 +51,15 @@ function TrendingTags() {
 function SuggestedUsers() {
   const { user: currentUser } = useAuthStore()
 
-  // Use a stable fallback list when API isn't available
+  // Suggested users — disabled until a real endpoint is available
   const { data } = useQuery({
     queryKey: ['suggested-users'],
-    queryFn: () => usersApi.getFollowing('_suggested'),
-    enabled: false, // Replace with real endpoint when available
+    queryFn: async () => null,
+    enabled: false,
     retry: false,
   })
 
-  const users = data?.data ?? []
+  const users = (data as null) === null ? [] : []
 
   if (users.length === 0) return null
 

@@ -32,8 +32,8 @@ export default function NotificationsPage() {
     },
   })
 
-  const notifications = data?.data ?? []
-  const unread = notifications.filter((n) => !n.isRead)
+  const notifications = data?.items ?? []
+  const unread = notifications.filter((n) => !n.read)
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -43,9 +43,9 @@ export default function NotificationsPage() {
             <Bell className="h-5 w-5" />
             Notifications
           </h1>
-          {data?.meta.unreadCount != null && data.meta.unreadCount > 0 && (
+          {unread.length > 0 && (
             <p className="text-sm text-muted-foreground mt-0.5">
-              {data.meta.unreadCount} unread
+              {unread.length} unread
             </p>
           )}
         </div>
@@ -76,38 +76,44 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
-          {notifications.map((n) => (
-            <div
-              key={n.id}
-              className={cn(
-                'flex gap-3 px-4 py-4 transition-colors',
-                !n.isRead && 'bg-primary/5',
-                'hover:bg-accent cursor-pointer'
-              )}
-              onClick={() => {
-                if (!n.isRead) markReadMutation.mutate(n.id)
-                if (n.targetUrl) window.location.href = n.targetUrl
-              }}
-            >
-              {n.actor ? (
-                <Avatar src={n.actor.avatarUrl} name={n.actor.displayName} size="sm" className="shrink-0 mt-0.5" />
-              ) : (
-                <div className="h-7 w-7 shrink-0 flex items-center justify-center rounded-full bg-primary/10 mt-0.5">
-                  <Bell className="h-3.5 w-3.5 text-primary" />
+          {notifications.map((n) => {
+            // Extract display info from payloadJson if available
+            const payload = n.payloadJson ?? {}
+            const actorName = (payload.actor_name as string) ?? (payload.actorName as string) ?? null
+
+            return (
+              <div
+                key={n.id}
+                className={cn(
+                  'flex gap-3 px-4 py-4 transition-colors',
+                  !n.read && 'bg-primary/5',
+                  'hover:bg-accent cursor-pointer'
+                )}
+                onClick={() => {
+                  if (!n.read) markReadMutation.mutate(n.id)
+                }}
+              >
+                {actorName ? (
+                  <Avatar src={null} name={actorName} size="sm" className="shrink-0 mt-0.5" />
+                ) : (
+                  <div className="h-7 w-7 shrink-0 flex items-center justify-center rounded-full bg-primary/10 mt-0.5">
+                    <Bell className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className={cn('text-sm', !n.read && 'font-medium')}>
+                    {n.type.replace(/_/g, ' ')}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {formatRelativeTime(n.createdAt)}
+                  </p>
                 </div>
-              )}
-              <div className="flex-1 min-w-0">
-                {n.title && <p className="text-sm font-medium">{n.title}</p>}
-                <p className={cn('text-sm', !n.isRead && 'font-medium')}>{n.body}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {formatRelativeTime(n.createdAt)}
-                </p>
+                {!n.read && (
+                  <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                )}
               </div>
-              {!n.isRead && (
-                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

@@ -12,25 +12,35 @@ export interface RegisterCredentials {
   displayName?: string
 }
 
-export interface AuthResponse {
-  accessToken: string
-  user: UserProfile
-}
-
 export interface UserProfile {
   id: string
   username: string
   email: string
-  displayName: string
+  displayName: string | null
   avatarUrl: string | null
-  bio: string | null
-  role: 'user' | 'moderator' | 'admin'
-  followersCount: number
-  followingCount: number
-  postsCount: number
-  videosCount: number
-  createdAt: string
+  coverUrl?: string | null
+  bio?: string | null
+  websiteUrl?: string | null
+  location?: string | null
+  role: string
+  followerCount?: number
+  followingCount?: number
+  postCount?: number
+  createdAt?: string
   isFollowing?: boolean
+  // Legacy aliases kept for backward compat
+  followersCount?: number
+  followingCount_?: number
+  postsCount?: number
+  videosCount?: number
+}
+
+export interface AuthResponse {
+  accessToken: string
+  refreshToken?: string
+  tokenType?: string
+  expiresIn?: number
+  user: UserProfile
 }
 
 export const authApi = {
@@ -39,8 +49,13 @@ export const authApi = {
     return data
   },
 
-  register: async (credentials: RegisterCredentials): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<AuthResponse>('/auth/register', credentials)
+  register: async (credentials: RegisterCredentials): Promise<{ message: string }> => {
+    const { data } = await apiClient.post<{ message: string }>('/auth/register', {
+      username: credentials.username,
+      email: credentials.email,
+      password: credentials.password,
+      display_name: credentials.displayName,
+    })
     return data
   },
 
@@ -54,7 +69,7 @@ export const authApi = {
   },
 
   me: async (): Promise<UserProfile> => {
-    const { data } = await apiClient.get<UserProfile>('/auth/me')
+    const { data } = await apiClient.get<UserProfile>('/users/me')
     return data
   },
 
@@ -62,7 +77,10 @@ export const authApi = {
     currentPassword: string
     newPassword: string
   }): Promise<void> => {
-    await apiClient.put('/auth/password', payload)
+    await apiClient.post('/users/me/change-password', {
+      current_password: payload.currentPassword,
+      new_password: payload.newPassword,
+    })
   },
 
   forgotPassword: async (email: string): Promise<void> => {
@@ -70,6 +88,6 @@ export const authApi = {
   },
 
   resetPassword: async (token: string, password: string): Promise<void> => {
-    await apiClient.post('/auth/reset-password', { token, password })
+    await apiClient.post('/auth/reset-password', { token, new_password: password })
   },
 }

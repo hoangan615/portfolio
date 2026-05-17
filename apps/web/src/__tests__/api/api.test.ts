@@ -24,6 +24,7 @@ const mockGet = vi.mocked(apiClient.get)
 const mockPost = vi.mocked(apiClient.post)
 const mockPut = vi.mocked(apiClient.put)
 const mockDelete = vi.mocked(apiClient.delete)
+const mockPatch = vi.mocked(apiClient.patch)
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -56,10 +57,10 @@ describe('authApi', () => {
     expect(result.accessToken).toBe('new')
   })
 
-  it('me gets /auth/me', async () => {
+  it('me gets /users/me', async () => {
     mockGet.mockResolvedValueOnce({ data: { id: '1', username: 'u' } })
     const result = await authApi.me()
-    expect(mockGet).toHaveBeenCalledWith('/auth/me')
+    expect(mockGet).toHaveBeenCalledWith('/users/me')
     expect(result.id).toBe('1')
   })
 
@@ -70,12 +71,15 @@ describe('authApi', () => {
 
   it('resetPassword posts to /auth/reset-password', async () => {
     await authApi.resetPassword('tok123', 'newpass')
-    expect(mockPost).toHaveBeenCalledWith('/auth/reset-password', { token: 'tok123', password: 'newpass' })
+    expect(mockPost).toHaveBeenCalledWith('/auth/reset-password', { token: 'tok123', new_password: 'newpass' })
   })
 
-  it('updatePassword puts to /auth/password', async () => {
+  it('updatePassword posts to /users/me/change-password', async () => {
     await authApi.updatePassword({ currentPassword: 'old', newPassword: 'new' })
-    expect(mockPut).toHaveBeenCalledWith('/auth/password', { currentPassword: 'old', newPassword: 'new' })
+    expect(mockPost).toHaveBeenCalledWith('/users/me/change-password', {
+      current_password: 'old',
+      new_password: 'new',
+    })
   })
 })
 
@@ -88,16 +92,16 @@ describe('feedApi', () => {
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/feed/global'))
   })
 
-  it('getFollowingFeed calls /feed/following', async () => {
+  it('getFollowingFeed calls /feed', async () => {
     mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
     await feedApi.getFollowingFeed()
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/feed/following'))
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/feed'))
   })
 
   it('getTrendingFeed calls /feed/trending', async () => {
     mockGet.mockResolvedValueOnce({ data: [] })
     await feedApi.getTrendingFeed()
-    expect(mockGet).toHaveBeenCalledWith('/feed/trending')
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/feed/trending'))
   })
 
   it('getExploreFeed calls /feed/explore', async () => {
@@ -116,13 +120,13 @@ describe('usersApi', () => {
     expect(mockGet).toHaveBeenCalledWith('/users/testuser')
   })
 
-  it('followUser posts to /users/:username/follow', async () => {
+  it('followUser posts to /users/:userId/follow', async () => {
     mockPost.mockResolvedValueOnce({ data: { following: true } })
     await usersApi.followUser('testuser')
     expect(mockPost).toHaveBeenCalledWith('/users/testuser/follow')
   })
 
-  it('unfollowUser deletes /users/:username/follow', async () => {
+  it('unfollowUser deletes /users/:userId/follow', async () => {
     mockDelete.mockResolvedValueOnce({ data: { following: false } })
     await usersApi.unfollowUser('testuser')
     expect(mockDelete).toHaveBeenCalledWith('/users/testuser/follow')
@@ -134,13 +138,13 @@ describe('usersApi', () => {
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/followers'))
   })
 
-  it('updateProfile puts to /users/me', async () => {
-    mockPut.mockResolvedValueOnce({ data: {} })
+  it('updateProfile patches /users/me with snake_case body', async () => {
+    mockPatch.mockResolvedValueOnce({ data: {} })
     await usersApi.updateProfile({ displayName: 'New Name' })
-    expect(mockPut).toHaveBeenCalledWith('/users/me', { displayName: 'New Name' })
+    expect(mockPatch).toHaveBeenCalledWith('/users/me', { display_name: 'New Name' })
   })
 
-  it('getFollowing calls /users/:username/following', async () => {
+  it('getFollowing calls /users/:userId/following', async () => {
     mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
     await usersApi.getFollowing('testuser', { page: 1 })
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/following'))
@@ -152,9 +156,9 @@ describe('usersApi', () => {
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/following'))
   })
 
-  it('getFollowers with explicit limit', async () => {
+  it('getFollowers with explicit pageSize', async () => {
     mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await usersApi.getFollowers('testuser', { page: 1, limit: 10 })
+    await usersApi.getFollowers('testuser', { page: 1, pageSize: 10 })
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/followers'))
   })
 
@@ -164,27 +168,16 @@ describe('usersApi', () => {
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/followers'))
   })
 
-  it('getUserPosts calls /users/:username/posts', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await usersApi.getUserPosts('testuser')
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/posts'))
+  it('getUserPosts calls /posts with user_id query param', async () => {
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
+    await usersApi.getUserPosts('user-uuid')
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/posts'))
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('user_id=user-uuid'))
   })
 
   it('getUserPosts with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await usersApi.getUserPosts('testuser', { page: 2, limit: 10, cursor: 'abc' })
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/posts'))
-  })
-
-  it('getUserVideos calls /users/:username/videos', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await usersApi.getUserVideos('testuser')
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/videos'))
-  })
-
-  it('getUserVideos with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await usersApi.getUserVideos('testuser', { page: 2, limit: 8, cursor: 'xyz' })
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/users/testuser/videos'))
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
+    await usersApi.getUserPosts('user-uuid', { page: 2, pageSize: 10 })
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('page=2'))
   })
 })

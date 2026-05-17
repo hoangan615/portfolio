@@ -4,44 +4,47 @@ import { buildQueryString } from '@/lib/utils'
 
 export interface Post {
   id: string
+  userId: string
+  type: string
+  title: string | null
   slug: string
-  title: string
-  content: string
-  excerpt: string
-  coverImage: string | null
-  author: {
-    id: string
-    username: string
-    displayName: string
-    avatarUrl: string | null
-  }
-  tags: string[]
-  likesCount: number
-  commentsCount: number
-  viewsCount: number
-  isLiked: boolean
-  isBookmarked: boolean
-  publishedAt: string
+  excerpt: string | null
+  coverImageUrl: string | null
+  status: string
+  viewCount: number
+  publishedAt: string | null
+  scheduledAt: string | null
   createdAt: string
   updatedAt: string
+  content?: string | null
+  reviewNote?: string | null
 }
 
+// Matches backend CommentOut schema (after camelCase transform)
 export interface Comment {
   id: string
-  content: string
-  author: {
-    id: string
-    username: string
-    displayName: string
-    avatarUrl: string | null
-  }
-  likesCount: number
-  isLiked: boolean
+  contentType: string
+  contentId: string
+  userId: string
   parentId: string | null
-  replies?: Comment[]
+  body: string
+  editedAt: string | null
+  deletedAt: string | null
   createdAt: string
 }
 
+// Backend PagedResponse shape (after camelCase transform)
+export interface PagedResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  pageSize: number
+  pages: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
+// Legacy alias kept for backward compat with old code
 export interface PaginatedResponse<T> {
   data: T[]
   meta: {
@@ -54,30 +57,38 @@ export interface PaginatedResponse<T> {
 }
 
 export interface CreatePostPayload {
-  title: string
-  content: string
+  type?: string  // article|short|gallery|til
+  title?: string
+  content?: string
   excerpt?: string
-  coverImage?: string
-  tags?: string[]
-  published?: boolean
+  coverImageUrl?: string
+  categoryIds?: string[]
+  tagIds?: string[]
 }
 
 export const postsApi = {
   list: async (params?: {
     page?: number
-    limit?: number
-    tag?: string
-    authorId?: string
-    cursor?: string
-  }): Promise<PaginatedResponse<Post>> => {
+    pageSize?: number
+    postType?: string
+    userId?: string
+  }): Promise<PagedResponse<Post>> => {
     const qs = buildQueryString({
       page: params?.page ?? 1,
-      limit: params?.limit ?? PAGINATION.defaultLimit,
-      tag: params?.tag,
-      authorId: params?.authorId,
-      cursor: params?.cursor,
+      page_size: params?.pageSize ?? PAGINATION.defaultLimit,
+      post_type: params?.postType,
+      user_id: params?.userId,
     })
-    const { data } = await apiClient.get<PaginatedResponse<Post>>(`/posts${qs}`)
+    const { data } = await apiClient.get<PagedResponse<Post>>(`/posts${qs}`)
+    return data
+  },
+
+  listMine: async (params?: { page?: number; pageSize?: number }): Promise<PagedResponse<Post>> => {
+    const qs = buildQueryString({
+      page: params?.page ?? 1,
+      page_size: params?.pageSize ?? 100,
+    })
+    const { data } = await apiClient.get<PagedResponse<Post>>(`/posts/mine${qs}`)
     return data
   },
 
@@ -87,12 +98,34 @@ export const postsApi = {
   },
 
   create: async (payload: CreatePostPayload): Promise<Post> => {
-    const { data } = await apiClient.post<Post>('/posts', payload)
+    const body: Record<string, unknown> = {
+      type: payload.type ?? 'article',
+    }
+    if (payload.title !== undefined) body.title = payload.title
+    if (payload.content !== undefined) body.content = payload.content
+    if (payload.excerpt !== undefined) body.excerpt = payload.excerpt
+    if (payload.coverImageUrl !== undefined) body.cover_image_url = payload.coverImageUrl
+    if (payload.categoryIds !== undefined) body.category_ids = payload.categoryIds
+    if (payload.tagIds !== undefined) body.tag_ids = payload.tagIds
+    const { data } = await apiClient.post<Post>('/posts', body)
     return data
   },
 
   update: async (id: string, payload: Partial<CreatePostPayload>): Promise<Post> => {
-    const { data } = await apiClient.put<Post>(`/posts/${id}`, payload)
+    const body: Record<string, unknown> = {}
+    if (payload.type !== undefined) body.type = payload.type
+    if (payload.title !== undefined) body.title = payload.title
+    if (payload.content !== undefined) body.content = payload.content
+    if (payload.excerpt !== undefined) body.excerpt = payload.excerpt
+    if (payload.coverImageUrl !== undefined) body.cover_image_url = payload.coverImageUrl
+    if (payload.categoryIds !== undefined) body.category_ids = payload.categoryIds
+    if (payload.tagIds !== undefined) body.tag_ids = payload.tagIds
+    const { data } = await apiClient.put<Post>(`/posts/${id}`, body)
+    return data
+  },
+
+  submit: async (id: string): Promise<Post> => {
+    const { data } = await apiClient.post<Post>(`/posts/${id}/submit`)
     return data
   },
 
@@ -100,45 +133,4 @@ export const postsApi = {
     await apiClient.delete(`/posts/${id}`)
   },
 
-  like: async (id: string): Promise<{ liked: boolean; count: number }> => {
-    const { data } = await apiClient.post(`/posts/${id}/like`)
-    return data
-  },
-
-  bookmark: async (id: string): Promise<{ bookmarked: boolean }> => {
-    const { data } = await apiClient.post(`/posts/${id}/bookmark`)
-    return data
-  },
-
-  // Comments
-  getComments: async (
-    postId: string,
-    params?: { page?: number; limit?: number }
-  ): Promise<PaginatedResponse<Comment>> => {
-    const qs = buildQueryString({
-      page: params?.page ?? 1,
-      limit: params?.limit ?? PAGINATION.commentLimit,
-    })
-    const { data } = await apiClient.get<PaginatedResponse<Comment>>(
-      `/posts/${postId}/comments${qs}`
-    )
-    return data
-  },
-
-  addComment: async (postId: string, content: string, parentId?: string): Promise<Comment> => {
-    const { data } = await apiClient.post<Comment>(`/posts/${postId}/comments`, {
-      content,
-      parentId,
-    })
-    return data
-  },
-
-  deleteComment: async (postId: string, commentId: string): Promise<void> => {
-    await apiClient.delete(`/posts/${postId}/comments/${commentId}`)
-  },
-
-  likeComment: async (postId: string, commentId: string): Promise<{ liked: boolean; count: number }> => {
-    const { data } = await apiClient.post(`/posts/${postId}/comments/${commentId}/like`)
-    return data
-  },
 }

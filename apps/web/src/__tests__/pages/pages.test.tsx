@@ -27,7 +27,7 @@ vi.mock('@/features/profile/UserProfile', () => ({ default: ({ username }: { use
 vi.mock('@/features/video/WatchPage', () => ({ default: ({ videoId }: { videoId: string }) => <div>Watch:{videoId}</div> }))
 vi.mock('@/shared/api/notifications', () => ({
   notificationsApi: {
-    getNotifications: vi.fn().mockResolvedValue({ data: [], meta: { unreadCount: 0, total: 0 } }),
+    getNotifications: vi.fn().mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 50, pages: 0, hasNext: false, hasPrev: false }),
     markAllRead: vi.fn().mockResolvedValue(undefined),
     markRead: vi.fn().mockResolvedValue(undefined),
   },
@@ -272,23 +272,32 @@ import NotificationsPage from '@/pages/NotificationsPage'
 
 import { notificationsApi } from '@/shared/api/notifications'
 
+// Notification shape matches backend NotificationOut (after camelCase transform)
 const mockNotification = {
   id: 'n1',
-  type: 'follow' as const,
-  title: 'New follower',
-  body: 'Someone followed you',
-  isRead: false,
-  actor: { id: 'u1', username: 'alice', displayName: 'Alice', avatarUrl: null },
-  targetUrl: '/u/alice',
+  userId: 'user-1',
+  type: 'new_follow',
+  actorId: 'u1',
+  contentType: null,
+  contentId: null,
+  payloadJson: { actor_name: 'Alice' },
+  read: false,
   createdAt: '2024-01-01T00:00:00Z',
 }
 
+const pagedResponse = (items: typeof mockNotification[]) => ({
+  items,
+  total: items.length,
+  page: 1,
+  pageSize: 50,
+  pages: 1,
+  hasNext: false,
+  hasPrev: false,
+})
+
 describe('NotificationsPage', () => {
   beforeEach(() => {
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValue({
-      data: [],
-      meta: { total: 0, unreadCount: 0, page: 1, limit: 50, hasMore: false },
-    })
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValue(pagedResponse([]))
   })
 
   it('renders Notifications heading', () => {
@@ -304,84 +313,84 @@ describe('NotificationsPage', () => {
   })
 
   it('renders notification items when data is present', async () => {
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [mockNotification],
-      meta: { total: 1, unreadCount: 1, page: 1, limit: 50, hasMore: false },
-    })
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([mockNotification])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
-      expect(screen.getByText('Someone followed you')).toBeInTheDocument()
+      // The page renders n.type.replace(/_/g, ' ')
+      expect(screen.getByText('new follow')).toBeInTheDocument()
     )
   })
 
   it('shows mark all read button when unread notifications exist', async () => {
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [mockNotification],
-      meta: { total: 1, unreadCount: 1, page: 1, limit: 50, hasMore: false },
-    })
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([mockNotification])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /mark all read/i })).toBeInTheDocument()
     )
   })
 
-  it('shows unread count when meta.unreadCount > 0', async () => {
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [mockNotification],
-      meta: { total: 1, unreadCount: 3, page: 1, limit: 50, hasMore: false },
-    })
+  it('shows unread count when unread notifications exist', async () => {
+    // 3 unread notifications: unread count comes from items filtered by !read
+    const unreadNotifs = [
+      { ...mockNotification, id: 'n1' },
+      { ...mockNotification, id: 'n2' },
+      { ...mockNotification, id: 'n3' },
+    ]
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse(unreadNotifs)
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
       expect(screen.getByText(/3 unread/i)).toBeInTheDocument()
     )
   })
 
-  it('renders notification with actor avatar', async () => {
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [mockNotification],
-      meta: { total: 1, unreadCount: 1, page: 1, limit: 50, hasMore: false },
-    })
+  it('renders notification with actor name from payloadJson', async () => {
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([mockNotification])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
-      expect(screen.getByText('Someone followed you')).toBeInTheDocument()
+      expect(screen.getByText('new follow')).toBeInTheDocument()
     )
   })
 
   it('renders notification without actor (system notification)', async () => {
-    const systemNotif = { ...mockNotification, actor: null, title: '' }
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [systemNotif],
-      meta: { total: 1, unreadCount: 1, page: 1, limit: 50, hasMore: false },
-    })
+    const systemNotif = { ...mockNotification, actorId: null, payloadJson: null }
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([systemNotif])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
-      expect(screen.getByText('Someone followed you')).toBeInTheDocument()
+      expect(screen.getByText('new follow')).toBeInTheDocument()
     )
   })
 
   it('renders read notification (without unread dot)', async () => {
-    const readNotif = { ...mockNotification, isRead: true }
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [readNotif],
-      meta: { total: 1, unreadCount: 0, page: 1, limit: 50, hasMore: false },
-    })
+    const readNotif = { ...mockNotification, read: true }
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([readNotif])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
-      expect(screen.getByText('Someone followed you')).toBeInTheDocument()
+      expect(screen.getByText('new follow')).toBeInTheDocument()
     )
   })
 
   it('marks a notification as read when clicked', async () => {
-    vi.mocked(notificationsApi.markRead).mockResolvedValue(undefined)
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [mockNotification],
-      meta: { total: 1, unreadCount: 1, page: 1, limit: 50, hasMore: false },
-    })
+    vi.mocked(notificationsApi.markRead).mockResolvedValue(mockNotification)
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([mockNotification])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
-      expect(screen.getByText('Someone followed you')).toBeInTheDocument()
+      expect(screen.getByText('new follow')).toBeInTheDocument()
     )
-    fireEvent.click(screen.getByText('Someone followed you'))
+    fireEvent.click(screen.getByText('new follow'))
     await waitFor(() =>
       expect(notificationsApi.markRead).toHaveBeenCalledWith('n1')
     )
@@ -389,10 +398,9 @@ describe('NotificationsPage', () => {
 
   it('marks all as read when button clicked', async () => {
     vi.mocked(notificationsApi.markAllRead).mockResolvedValue(undefined)
-    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce({
-      data: [mockNotification],
-      meta: { total: 1, unreadCount: 1, page: 1, limit: 50, hasMore: false },
-    })
+    vi.mocked(notificationsApi.getNotifications).mockResolvedValueOnce(
+      pagedResponse([mockNotification])
+    )
     renderWithQuery(<NotificationsPage />)
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /mark all read/i })).toBeInTheDocument()

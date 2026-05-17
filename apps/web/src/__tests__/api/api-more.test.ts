@@ -35,7 +35,7 @@ beforeEach(() => vi.clearAllMocks())
 
 describe('postsApi', () => {
   it('list gets /posts', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
     await postsApi.list()
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/posts'))
   })
@@ -63,51 +63,22 @@ describe('postsApi', () => {
     expect(mockDelete).toHaveBeenCalledWith('/posts/post-id')
   })
 
-  it('like posts to /posts/:id/like', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await postsApi.like('post-id')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('post-id'))
-  })
-
-  it('bookmark posts to /posts/:id/bookmark', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await postsApi.bookmark('post-id')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('post-id'))
-  })
-
   it('list with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await postsApi.list({ page: 2, limit: 10, tag: 'react', authorId: 'u1', cursor: 'abc' })
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
+    await postsApi.list({ page: 2, pageSize: 10, postType: 'article', userId: 'u1' })
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('page=2'))
   })
 
-  it('getComments gets /posts/:id/comments', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await postsApi.getComments('post-id')
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/posts/post-id/comments'))
+  it('listMine gets /posts/mine', async () => {
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
+    await postsApi.listMine()
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/posts/mine'))
   })
 
-  it('getComments with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await postsApi.getComments('post-id', { page: 2, limit: 5 })
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/posts/post-id/comments'))
-  })
-
-  it('addComment posts to /posts/:id/comments', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await postsApi.addComment('post-id', 'Nice!')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('/posts/post-id/comments'), expect.any(Object))
-  })
-
-  it('deleteComment deletes /posts/:postId/comments/:id', async () => {
-    await postsApi.deleteComment('post-id', 'comment-id')
-    expect(mockDelete).toHaveBeenCalledWith(expect.stringContaining('/posts/post-id/comments/comment-id'))
-  })
-
-  it('likeComment posts to /posts/:postId/comments/:id/like', async () => {
-    mockPost.mockResolvedValueOnce({ data: { liked: true, count: 1 } })
-    await postsApi.likeComment('post-id', 'comment-id')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('comment-id'))
+  it('submit posts to /posts/:id/submit', async () => {
+    mockPost.mockResolvedValueOnce({ data: { id: 'post-id' } })
+    await postsApi.submit('post-id')
+    expect(mockPost).toHaveBeenCalledWith('/posts/post-id/submit')
   })
 })
 
@@ -115,7 +86,7 @@ describe('postsApi', () => {
 
 describe('videosApi', () => {
   it('list gets /videos', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
     await videosApi.list()
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/videos'))
   })
@@ -132,76 +103,15 @@ describe('videosApi', () => {
   })
 
   it('list with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await videosApi.list({ page: 1, limit: 6, tag: 'js', authorId: 'u1', cursor: 'xyz' })
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
+    await videosApi.list({ page: 1, pageSize: 6 })
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/videos'))
-  })
-
-  it('trending calls /videos/trending', async () => {
-    mockGet.mockResolvedValueOnce({ data: [] })
-    await videosApi.trending()
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/videos/trending'))
-  })
-
-  it('trending with explicit limit', async () => {
-    mockGet.mockResolvedValueOnce({ data: [] })
-    await videosApi.trending(5)
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('limit=5'))
-  })
-
-  it('getComments with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await videosApi.getComments('v1', { page: 2, limit: 5 })
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/comments'))
-  })
-
-  it('addComment with parentId', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await videosApi.addComment('v1', 'Reply', 'parent-id')
-    expect(mockPost).toHaveBeenCalledWith(
-      expect.stringContaining('/videos/v1/comments'),
-      expect.objectContaining({ parentId: 'parent-id' })
-    )
   })
 
   it('update puts to /videos/:id', async () => {
     mockPut.mockResolvedValueOnce({ data: {} })
     await videosApi.update('v1', { title: 'New Title' })
     expect(mockPut).toHaveBeenCalledWith('/videos/v1', { title: 'New Title' })
-  })
-
-  it('like posts to /videos/:id/like', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await videosApi.like('v1')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/like'))
-  })
-
-  it('bookmark posts to /videos/:id/bookmark', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await videosApi.bookmark('v1')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/bookmark'))
-  })
-
-  it('incrementView posts to /videos/:id/view', async () => {
-    await videosApi.incrementView('v1')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/view'))
-  })
-
-  it('getComments gets /videos/:id/comments', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await videosApi.getComments('v1')
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/comments'))
-  })
-
-  it('addComment posts to /videos/:id/comments', async () => {
-    mockPost.mockResolvedValueOnce({ data: {} })
-    await videosApi.addComment('v1', 'Great video!')
-    expect(mockPost).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/comments'), expect.any(Object))
-  })
-
-  it('deleteComment deletes /videos/:videoId/comments/:id', async () => {
-    await videosApi.deleteComment('v1', 'c1')
-    expect(mockDelete).toHaveBeenCalledWith(expect.stringContaining('/videos/v1/comments/c1'))
   })
 })
 
@@ -220,19 +130,20 @@ describe('searchApi', () => {
 
 describe('notificationsApi', () => {
   it('getNotifications gets /notifications', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
     await notificationsApi.getNotifications()
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/notifications'))
   })
 
-  it('markRead posts to notification read endpoint', async () => {
+  it('markRead puts to /notifications/:id/read', async () => {
+    mockPut.mockResolvedValueOnce({ data: {} })
     await notificationsApi.markRead('notif-id')
-    expect(mockPost).toHaveBeenCalledWith('/notifications/notif-id/read')
+    expect(mockPut).toHaveBeenCalledWith('/notifications/notif-id/read')
   })
 
-  it('markAllRead posts to read-all endpoint', async () => {
+  it('markAllRead puts to /notifications/read-all', async () => {
     await notificationsApi.markAllRead()
-    expect(mockPost).toHaveBeenCalledWith('/notifications/read-all')
+    expect(mockPut).toHaveBeenCalledWith('/notifications/read-all')
   })
 })
 
@@ -240,7 +151,7 @@ describe('notificationsApi', () => {
 
 describe('commentsApi', () => {
   it('getComments gets /comments', async () => {
-    mockGet.mockResolvedValueOnce({ data: [] })
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
     await commentsApi.getComments('post', 'post-id')
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/comments'))
   })
@@ -256,31 +167,31 @@ describe('commentsApi', () => {
     expect(mockDelete).toHaveBeenCalledWith('/comments/comment-id')
   })
 
-  it('getComments with explicit params', async () => {
-    mockGet.mockResolvedValueOnce({ data: { data: [], meta: {} } })
-    await commentsApi.getComments('post', 'post-id', { page: 2, limit: 5 })
-    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/posts/post-id/comments'))
+  it('getComments with explicit params passes page_size', async () => {
+    mockGet.mockResolvedValueOnce({ data: { items: [], total: 0 } })
+    await commentsApi.getComments('post', 'post-id', { page: 2, pageSize: 5 })
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('/comments'))
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('page=2'))
   })
 
-  it('addComment with parentId', async () => {
+  it('addComment with parentId sends parent_id and body', async () => {
     mockPost.mockResolvedValueOnce({ data: {} })
     await commentsApi.addComment('post', 'post-id', 'Reply!', 'parent-id')
     expect(mockPost).toHaveBeenCalledWith(
-      expect.stringContaining('/posts/post-id/comments'),
-      expect.objectContaining({ parentId: 'parent-id' })
+      '/comments',
+      expect.objectContaining({ body: 'Reply!', parent_id: 'parent-id' })
     )
   })
 
-  it('editComment puts to /comments/:id', async () => {
+  it('editComment puts to /comments/:id with body field', async () => {
     mockPut.mockResolvedValueOnce({ data: {} })
     await commentsApi.editComment('comment-id', 'edited content')
-    expect(mockPut).toHaveBeenCalledWith('/comments/comment-id', { content: 'edited content' })
+    expect(mockPut).toHaveBeenCalledWith('/comments/comment-id', { body: 'edited content' })
   })
 
-  it('likeComment posts to /comments/:id/like', async () => {
-    mockPost.mockResolvedValueOnce({ data: { liked: true, count: 1 } })
-    await commentsApi.likeComment('comment-id')
-    expect(mockPost).toHaveBeenCalledWith('/comments/comment-id/like')
+  it('likeComment returns stub result (reactions API handles likes)', async () => {
+    const result = await commentsApi.likeComment('comment-id')
+    expect(result).toEqual({ liked: false, count: 0 })
   })
 })
 

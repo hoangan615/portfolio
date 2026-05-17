@@ -240,23 +240,16 @@ import PostCard from '@/shared/components/PostCard'
 
 const mockPost = {
   id: 'post-1',
+  userId: 'user-1',
   slug: 'my-post',
   title: 'My Post Title',
   excerpt: 'Post excerpt here',
-  coverImage: null,
-  author: {
-    id: 'user-1',
-    username: 'testuser',
-    displayName: 'Test User',
-    avatarUrl: null,
-  },
-  tags: ['react', 'typescript'],
-  likesCount: 5,
-  commentsCount: 3,
-  viewsCount: 100,
-  isLiked: false,
-  isBookmarked: false,
+  coverImageUrl: null,
+  type: 'article',
+  status: 'published',
+  viewCount: 100,
   publishedAt: '2024-01-01T00:00:00Z',
+  scheduledAt: null,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
 }
@@ -271,17 +264,17 @@ describe('PostCard', () => {
     expect(screen.getByText('My Post Title')).toBeInTheDocument()
   })
 
-  it('renders author name', () => {
+  it('renders excerpt when provided', () => {
     render(
       <MemoryRouter>
         <PostCard post={mockPost} />
       </MemoryRouter>
     )
-    expect(screen.getByText('Test User')).toBeInTheDocument()
+    expect(screen.getByText('Post excerpt here')).toBeInTheDocument()
   })
 
   it('renders cover image when provided and not compact', () => {
-    const postWithCover = { ...mockPost, coverImage: 'https://example.com/cover.jpg' }
+    const postWithCover = { ...mockPost, coverImageUrl: 'https://example.com/cover.jpg' }
     render(
       <MemoryRouter>
         <PostCard post={postWithCover} />
@@ -291,7 +284,7 @@ describe('PostCard', () => {
   })
 
   it('does not render cover image in compact mode', () => {
-    const postWithCover = { ...mockPost, coverImage: 'https://example.com/cover.jpg' }
+    const postWithCover = { ...mockPost, coverImageUrl: 'https://example.com/cover.jpg' }
     render(
       <MemoryRouter>
         <PostCard post={postWithCover} compact />

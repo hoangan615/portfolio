@@ -2,6 +2,27 @@ import axios, { type AxiosError, type AxiosRequestConfig, type InternalAxiosRequ
 import { useAuthStore } from '@/shared/stores/authStore'
 import { API_URL } from '@/lib/constants'
 
+// ── snake_case → camelCase transformer ────────────────────────────────────────
+
+function snakeToCamel(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+}
+
+function transformResponse(data: unknown): unknown {
+  if (Array.isArray(data)) return data.map(transformResponse)
+  if (data !== null && typeof data === 'object') {
+    return Object.fromEntries(
+      Object.entries(data as Record<string, unknown>).map(([key, value]) => [
+        snakeToCamel(key),
+        transformResponse(value),
+      ])
+    )
+  }
+  return data
+}
+
+// ── Axios instance ────────────────────────────────────────────────────────────
+
 export const apiClient = axios.create({
   baseURL: `${API_URL}/api/v1`,
   withCredentials: true, // send HttpOnly refresh cookie
@@ -38,7 +59,11 @@ function processQueue(error: unknown, token: string | null = null) {
 }
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Transform snake_case keys to camelCase
+    response.data = transformResponse(response.data)
+    return response
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
 
@@ -63,7 +88,8 @@ apiClient.interceptors.response.use(
           {},
           { withCredentials: true }
         )
-        const newToken: string = data.accessToken
+        // After transformation, snake_case keys become camelCase
+        const newToken: string = data.accessToken ?? data.access_token
         useAuthStore.getState().setAccessToken(newToken)
         processQueue(null, newToken)
 

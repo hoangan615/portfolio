@@ -21,9 +21,11 @@ from core.security import (
 )
 from modules.auth.schemas import (
     LoginRequest,
+    LoginResponse,
     RegisterRequest,
     ResetPasswordRequest,
     TokenResponse,
+    UserPublicInline,
 )
 from modules.users.models import OAuthAccount, RefreshToken, User, UserSettings
 from shared.exceptions import BadRequestError, ConflictError, NotFoundError, UnauthorizedError
@@ -44,6 +46,25 @@ def _token_response(user: User, refresh_raw: str) -> TokenResponse:
         refresh_token=refresh_raw,
         token_type="bearer",
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+
+def _login_response(user: User, refresh_raw: str) -> LoginResponse:
+    access = create_access_token(user.id, user.role)
+    user_inline = UserPublicInline(
+        id=str(user.id),
+        username=user.username,
+        display_name=user.display_name,
+        avatar_url=user.avatar_url,
+        role=user.role,
+        email=user.email,
+    )
+    return LoginResponse(
+        access_token=access,
+        refresh_token=refresh_raw,
+        token_type="bearer",
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        user=user_inline,
     )
 
 
@@ -94,7 +115,7 @@ async def register(db: AsyncSession, schema: RegisterRequest) -> User:
 
 # ── Login ──────────────────────────────────────────────────────────────────────
 
-async def login(db: AsyncSession, schema: LoginRequest) -> TokenResponse:
+async def login(db: AsyncSession, schema: LoginRequest) -> LoginResponse:
     result = await db.execute(select(User).where(User.email == schema.email))
     user = result.scalar_one_or_none()
 
@@ -108,7 +129,7 @@ async def login(db: AsyncSession, schema: LoginRequest) -> TokenResponse:
 
     raw_refresh = create_refresh_token(user.id)
     await _store_refresh_token(db, user.id, raw_refresh)
-    return _token_response(user, raw_refresh)
+    return _login_response(user, raw_refresh)
 
 
 # ── Token refresh ──────────────────────────────────────────────────────────────

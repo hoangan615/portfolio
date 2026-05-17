@@ -1,7 +1,7 @@
 import apiClient from './client'
 import { buildQueryString } from '@/lib/utils'
 import { PAGINATION } from '@/lib/constants'
-import type { Comment, PaginatedResponse } from './posts'
+import type { Comment, PagedResponse } from './posts'
 
 export type ContentType = 'post' | 'video'
 
@@ -9,15 +9,15 @@ export const commentsApi = {
   getComments: async (
     contentType: ContentType,
     id: string,
-    params?: { page?: number; limit?: number }
-  ): Promise<PaginatedResponse<Comment>> => {
+    params?: { page?: number; pageSize?: number }
+  ): Promise<PagedResponse<Comment>> => {
     const qs = buildQueryString({
+      content_type: contentType,
+      content_id: id,
       page: params?.page ?? 1,
-      limit: params?.limit ?? PAGINATION.commentLimit,
+      page_size: params?.pageSize ?? PAGINATION.commentLimit,
     })
-    const { data } = await apiClient.get<PaginatedResponse<Comment>>(
-      `/${contentType}s/${id}/comments${qs}`
-    )
+    const { data } = await apiClient.get<PagedResponse<Comment>>(`/comments${qs}`)
     return data
   },
 
@@ -27,9 +27,11 @@ export const commentsApi = {
     body: string,
     parentId?: string
   ): Promise<Comment> => {
-    const { data } = await apiClient.post<Comment>(`/${contentType}s/${id}/comments`, {
-      content: body,
-      parentId,
+    const { data } = await apiClient.post<Comment>(`/comments`, {
+      content_type: contentType,
+      content_id: id,
+      body,
+      parent_id: parentId ?? null,
     })
     return data
   },
@@ -39,14 +41,12 @@ export const commentsApi = {
   },
 
   editComment: async (id: string, body: string): Promise<Comment> => {
-    const { data } = await apiClient.put<Comment>(`/comments/${id}`, { content: body })
+    const { data } = await apiClient.put<Comment>(`/comments/${id}`, { body })
     return data
   },
 
-  likeComment: async (id: string): Promise<{ liked: boolean; count: number }> => {
-    const { data } = await apiClient.post<{ liked: boolean; count: number }>(
-      `/comments/${id}/like`
-    )
-    return data
+  likeComment: async (_id: string): Promise<{ liked: boolean; count: number }> => {
+    // Comment likes are handled via the reactions API
+    return { liked: false, count: 0 }
   },
 }

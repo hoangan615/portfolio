@@ -6,7 +6,7 @@ from fastapi import APIRouter, Cookie, Depends, Query, Response, status
 from fastapi.responses import RedirectResponse
 
 from modules.auth import schemas, service
-from shared.dependencies import DBDep
+from shared.dependencies import CurrentUser, DBDep
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -43,11 +43,26 @@ async def register(body: schemas.RegisterRequest, db: DBDep):
 
 # ── Login ─────────────────────────────────────────────────────────────────────
 
-@router.post("/login", response_model=schemas.TokenResponse)
+@router.post("/login", response_model=schemas.LoginResponse)
 async def login(body: schemas.LoginRequest, response: Response, db: DBDep):
     tokens = await service.login(db, body)
     _set_refresh_cookie(response, tokens.refresh_token)  # pragma: no cover
     return tokens  # pragma: no cover
+
+
+# ── Get current user ──────────────────────────────────────────────────────────
+
+@router.get("/me", response_model=schemas.UserPublicInline)
+async def get_me(current_user: CurrentUser):
+    from modules.auth.schemas import UserPublicInline
+    return UserPublicInline(
+        id=str(current_user.id),  # type: ignore[union-attr]
+        username=current_user.username,  # type: ignore[union-attr]
+        display_name=current_user.display_name,  # type: ignore[union-attr]
+        avatar_url=current_user.avatar_url,  # type: ignore[union-attr]
+        role=current_user.role,  # type: ignore[union-attr]
+        email=current_user.email,  # type: ignore[union-attr]
+    )
 
 
 # ── Refresh ───────────────────────────────────────────────────────────────────
