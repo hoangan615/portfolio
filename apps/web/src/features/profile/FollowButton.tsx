@@ -8,13 +8,15 @@ import Button from '@/shared/components/Button'
 import type { ButtonProps } from '@/shared/components/Button'
 
 interface FollowButtonProps {
-  username: string
+  userId: string
+  username?: string
   isFollowing: boolean
   size?: ButtonProps['size']
   className?: string
 }
 
 export default function FollowButton({
+  userId,
   username,
   isFollowing: initialFollowing,
   size = 'sm',
@@ -28,8 +30,8 @@ export default function FollowButton({
   const mutation = useMutation({
     mutationFn: () =>
       following
-        ? usersApi.unfollowUser(username)
-        : usersApi.followUser(username),
+        ? usersApi.unfollowUser(userId)
+        : usersApi.followUser(userId),
     onMutate: () => {
       setFollowing((prev) => !prev)
     },
@@ -38,7 +40,9 @@ export default function FollowButton({
       setFollowing((prev) => !prev)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user(username) })
+      if (username) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user(username) })
+      }
     },
   })
 

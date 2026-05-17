@@ -1,64 +1,60 @@
 import apiClient from './client'
 import { PAGINATION } from '@/lib/constants'
 import { buildQueryString } from '@/lib/utils'
-import type { PaginatedResponse, Comment } from './posts'
+import type { PagedResponse } from './posts'
 
+// Matches backend VideoOut schema (after camelCase transform)
 export interface Video {
   id: string
+  userId: string
   title: string
   description: string | null
+  status: string
+  visibility: string
+  hlsManifestUrl: string | null
   thumbnailUrl: string | null
-  hlsUrl: string
-  duration: number
-  views: number
-  likesCount: number
-  commentsCount: number
-  isLiked: boolean
-  isBookmarked: boolean
-  tags: string[]
-  status: 'processing' | 'ready' | 'error'
-  author: {
-    id: string
-    username: string
-    displayName: string
-    avatarUrl: string | null
-  }
-  publishedAt: string
+  previewGifUrl: string | null
+  durationSeconds: number | null
+  fileSizeBytes: number | null
+  allowComment: boolean
+  allowEmbed: boolean
+  viewCount: number
+  publishedAt: string | null
   createdAt: string
+  updatedAt: string
+}
+
+// VideoDetail extends VideoOut with raw key and qualities
+export interface VideoDetail extends Video {
+  rawS3Key: string | null
+  qualities: VideoQualityLevel[]
 }
 
 export interface VideoQualityLevel {
-  height: number
-  bitrate: number
-  url: string
+  id: string
+  label: string
+  width: number | null
+  height: number | null
+  bitrate: number | null
+  s3Key: string
+  createdAt: string
 }
 
 export const videosApi = {
   list: async (params?: {
     page?: number
-    limit?: number
-    tag?: string
-    authorId?: string
-    cursor?: string
-  }): Promise<PaginatedResponse<Video>> => {
+    pageSize?: number
+  }): Promise<PagedResponse<Video>> => {
     const qs = buildQueryString({
       page: params?.page ?? 1,
-      limit: params?.limit ?? PAGINATION.videoLimit,
-      tag: params?.tag,
-      authorId: params?.authorId,
-      cursor: params?.cursor,
+      page_size: params?.pageSize ?? PAGINATION.videoLimit,
     })
-    const { data } = await apiClient.get<PaginatedResponse<Video>>(`/videos${qs}`)
+    const { data } = await apiClient.get<PagedResponse<Video>>(`/videos${qs}`)
     return data
   },
 
-  get: async (id: string): Promise<Video> => {
-    const { data } = await apiClient.get<Video>(`/videos/${id}`)
-    return data
-  },
-
-  trending: async (limit = 10): Promise<Video[]> => {
-    const { data } = await apiClient.get<Video[]>(`/videos/trending?limit=${limit}`)
+  get: async (id: string): Promise<VideoDetail> => {
+    const { data } = await apiClient.get<VideoDetail>(`/videos/${id}`)
     return data
   },
 
@@ -66,48 +62,14 @@ export const videosApi = {
     await apiClient.delete(`/videos/${id}`)
   },
 
-  update: async (id: string, payload: { title?: string; description?: string; tags?: string[] }): Promise<Video> => {
-    const { data } = await apiClient.put<Video>(`/videos/${id}`, payload)
+  update: async (id: string, payload: { title?: string; description?: string; visibility?: string; allowComment?: boolean; allowEmbed?: boolean }): Promise<Video> => {
+    const body: Record<string, unknown> = {}
+    if (payload.title !== undefined) body.title = payload.title
+    if (payload.description !== undefined) body.description = payload.description
+    if (payload.visibility !== undefined) body.visibility = payload.visibility
+    if (payload.allowComment !== undefined) body.allow_comment = payload.allowComment
+    if (payload.allowEmbed !== undefined) body.allow_embed = payload.allowEmbed
+    const { data } = await apiClient.put<Video>(`/videos/${id}`, body)
     return data
-  },
-
-  like: async (id: string): Promise<{ liked: boolean; count: number }> => {
-    const { data } = await apiClient.post(`/videos/${id}/like`)
-    return data
-  },
-
-  bookmark: async (id: string): Promise<{ bookmarked: boolean }> => {
-    const { data } = await apiClient.post(`/videos/${id}/bookmark`)
-    return data
-  },
-
-  incrementView: async (id: string): Promise<void> => {
-    await apiClient.post(`/videos/${id}/view`)
-  },
-
-  getComments: async (
-    videoId: string,
-    params?: { page?: number; limit?: number }
-  ): Promise<PaginatedResponse<Comment>> => {
-    const qs = buildQueryString({
-      page: params?.page ?? 1,
-      limit: params?.limit ?? PAGINATION.commentLimit,
-    })
-    const { data } = await apiClient.get<PaginatedResponse<Comment>>(
-      `/videos/${videoId}/comments${qs}`
-    )
-    return data
-  },
-
-  addComment: async (videoId: string, content: string, parentId?: string): Promise<Comment> => {
-    const { data } = await apiClient.post<Comment>(`/videos/${videoId}/comments`, {
-      content,
-      parentId,
-    })
-    return data
-  },
-
-  deleteComment: async (videoId: string, commentId: string): Promise<void> => {
-    await apiClient.delete(`/videos/${videoId}/comments/${commentId}`)
   },
 }

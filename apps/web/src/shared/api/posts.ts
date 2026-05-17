@@ -20,19 +20,16 @@ export interface Post {
   reviewNote?: string | null
 }
 
+// Matches backend CommentOut schema (after camelCase transform)
 export interface Comment {
   id: string
-  content: string
-  author: {
-    id: string
-    username: string
-    displayName: string
-    avatarUrl: string | null
-  }
-  likesCount: number
-  isLiked: boolean
+  contentType: string
+  contentId: string
+  userId: string
   parentId: string | null
-  replies?: Comment[]
+  body: string
+  editedAt: string | null
+  deletedAt: string | null
   createdAt: string
 }
 
@@ -136,35 +133,4 @@ export const postsApi = {
     await apiClient.delete(`/posts/${id}`)
   },
 
-  // Comments
-  getComments: async (
-    postId: string,
-    params?: { page?: number; limit?: number }
-  ): Promise<PaginatedResponse<Comment>> => {
-    const qs = buildQueryString({
-      page: params?.page ?? 1,
-      limit: params?.limit ?? PAGINATION.commentLimit,
-    })
-    const { data } = await apiClient.get<PaginatedResponse<Comment>>(
-      `/posts/${postId}/comments${qs}`
-    )
-    return data
-  },
-
-  addComment: async (postId: string, content: string, parentId?: string): Promise<Comment> => {
-    const { data } = await apiClient.post<Comment>(`/posts/${postId}/comments`, {
-      content,
-      parentId,
-    })
-    return data
-  },
-
-  deleteComment: async (postId: string, commentId: string): Promise<void> => {
-    await apiClient.delete(`/posts/${postId}/comments/${commentId}`)
-  },
-
-  likeComment: async (postId: string, commentId: string): Promise<{ liked: boolean; count: number }> => {
-    const { data } = await apiClient.post(`/posts/${postId}/comments/${commentId}/like`)
-    return data
-  },
 }

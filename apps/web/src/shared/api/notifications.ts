@@ -1,53 +1,42 @@
 import apiClient from './client'
+import { buildQueryString } from '@/lib/utils'
+import type { PagedResponse } from './posts'
 
+// Matches backend NotificationOut schema (after camelCase transform)
 export interface Notification {
   id: string
-  type:
-    | 'follow'
-    | 'like_post'
-    | 'like_video'
-    | 'comment_post'
-    | 'comment_video'
-    | 'reply'
-    | 'mention'
-    | 'system'
-  title: string
-  body: string
-  isRead: boolean
-  actor: {
-    id: string
-    username: string
-    displayName: string
-    avatarUrl: string | null
-  } | null
-  targetUrl: string | null
+  userId: string
+  type: string
+  actorId: string | null
+  contentType: string | null
+  contentId: string | null
+  payloadJson: Record<string, unknown> | null
+  read: boolean
   createdAt: string
 }
 
-export interface NotificationsResponse {
-  data: Notification[]
-  meta: {
-    total: number
-    unreadCount: number
-    page: number
-    limit: number
-    hasMore: boolean
-  }
+export interface UnreadCountResponse {
+  unreadCount: number
 }
 
 export const notificationsApi = {
-  getNotifications: async (page = 1, limit = 20): Promise<NotificationsResponse> => {
-    const { data } = await apiClient.get<NotificationsResponse>(
-      `/notifications?page=${page}&limit=${limit}`
-    )
+  getNotifications: async (page = 1, pageSize = 20): Promise<PagedResponse<Notification>> => {
+    const qs = buildQueryString({ page, page_size: pageSize })
+    const { data } = await apiClient.get<PagedResponse<Notification>>(`/notifications${qs}`)
+    return data
+  },
+
+  getUnreadCount: async (): Promise<UnreadCountResponse> => {
+    const { data } = await apiClient.get<UnreadCountResponse>('/notifications/unread-count')
     return data
   },
 
   markAllRead: async (): Promise<void> => {
-    await apiClient.post('/notifications/read-all')
+    await apiClient.put('/notifications/read-all')
   },
 
-  markRead: async (id: string): Promise<void> => {
-    await apiClient.post(`/notifications/${id}/read`)
+  markRead: async (id: string): Promise<Notification> => {
+    const { data } = await apiClient.put<Notification>(`/notifications/${id}/read`)
+    return data
   },
 }

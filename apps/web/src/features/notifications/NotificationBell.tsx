@@ -7,7 +7,6 @@ import { cn, formatRelativeTime } from '@/lib/utils'
 import { notificationsApi } from '@/shared/api/notifications'
 import { useNotificationStore } from '@/shared/stores/notificationStore'
 import { QUERY_KEYS, ROUTES } from '@/lib/constants'
-import Avatar from '@/shared/components/Avatar'
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)
@@ -28,13 +27,15 @@ export default function NotificationBell() {
     },
   })
 
+  // Update unread count from items
   useEffect(() => {
-    if (data?.meta?.unreadCount != null) {
-      setUnreadCount(data.meta.unreadCount)
+    if (data?.items) {
+      const unread = data.items.filter((n) => !n.read).length
+      setUnreadCount(unread)
     }
   }, [data, setUnreadCount])
 
-  const notifications = data?.data ?? []
+  const notifications = data?.items ?? []
 
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
@@ -91,50 +92,47 @@ export default function NotificationBell() {
                 <p className="text-sm">No notifications yet</p>
               </div>
             ) : (
-              notifications.map((n) => (
-                <DropdownMenu.Item key={n.id} asChild>
-                  <a
-                    href={n.targetUrl ?? '#'}
-                    className={cn(
-                      'flex gap-3 px-4 py-3 text-sm outline-none cursor-pointer',
-                      'hover:bg-accent transition-colors',
-                      !n.isRead && 'bg-primary/5'
-                    )}
-                    onClick={() => {
-                      if (!n.isRead) {
-                        notificationsApi.markRead(n.id).then(() => {
-                          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications })
-                        })
-                      }
-                      setOpen(false)
-                    }}
-                  >
-                    {n.actor ? (
-                      <Avatar
-                        src={n.actor.avatarUrl}
-                        name={n.actor.displayName}
-                        size="sm"
-                        className="shrink-0 mt-0.5"
-                      />
-                    ) : (
+              notifications.map((n) => {
+                const payload = n.payloadJson ?? {}
+                const actorName = (payload.actor_name as string) ?? (payload.actorName as string) ?? null
+
+                return (
+                  <DropdownMenu.Item key={n.id} asChild>
+                    <div
+                      className={cn(
+                        'flex gap-3 px-4 py-3 text-sm outline-none cursor-pointer',
+                        'hover:bg-accent transition-colors',
+                        !n.read && 'bg-primary/5'
+                      )}
+                      onClick={() => {
+                        if (!n.read) {
+                          notificationsApi.markRead(n.id).then(() => {
+                            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications })
+                          })
+                        }
+                        setOpen(false)
+                      }}
+                    >
                       <div className="h-7 w-7 shrink-0 flex items-center justify-center rounded-full bg-primary/10 mt-0.5">
                         <Bell className="h-3.5 w-3.5 text-primary" />
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className={cn('leading-snug', !n.isRead && 'font-medium')}>
-                        {n.body}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {formatRelativeTime(n.createdAt)}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <p className={cn('leading-snug', !n.read && 'font-medium')}>
+                          {actorName
+                            ? `${actorName} — ${n.type.replace(/_/g, ' ')}`
+                            : n.type.replace(/_/g, ' ')}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {formatRelativeTime(n.createdAt)}
+                        </p>
+                      </div>
+                      {!n.read && (
+                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                      )}
                     </div>
-                    {!n.isRead && (
-                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                    )}
-                  </a>
-                </DropdownMenu.Item>
-              ))
+                  </DropdownMenu.Item>
+                )
+              })
             )}
           </div>
 

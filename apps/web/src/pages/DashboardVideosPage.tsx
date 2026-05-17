@@ -6,7 +6,6 @@ import {
   Video,
   Trash2,
   Eye,
-  Heart,
   Clock,
   CheckCircle2,
   AlertCircle,
@@ -22,8 +21,14 @@ import LoadingSpinner from '@/shared/components/LoadingSpinner'
 import Modal from '@/shared/components/Modal'
 import VideoUpload from '@/features/video/VideoUpload'
 
-function StatusBadge({ status }: { status: 'processing' | 'ready' | 'error' }) {
-  const config = {
+type VideoStatus = 'processing' | 'ready' | 'error'
+
+function StatusBadge({ status }: { status: string }) {
+  const normalised = (['processing', 'ready', 'error'].includes(status)
+    ? status
+    : 'ready') as VideoStatus
+
+  const config: Record<VideoStatus, { icon: typeof Loader2; label: string; className: string; iconClass: string }> = {
     processing: {
       icon: Loader2,
       label: 'Processing',
@@ -44,7 +49,7 @@ function StatusBadge({ status }: { status: 'processing' | 'ready' | 'error' }) {
     },
   }
 
-  const { icon: Icon, label, className, iconClass } = config[status]
+  const { icon: Icon, label, className, iconClass } = config[normalised]
 
   return (
     <span
@@ -66,11 +71,11 @@ export default function DashboardVideosPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: [...QUERY_KEYS.videos, 'mine'],
-    queryFn: () => videosApi.list({ authorId: user?.id, limit: 50 }),
+    queryFn: () => videosApi.list({ pageSize: 50 }),
     enabled: !!user,
     refetchInterval: (query) => {
       // Refetch every 10s if any video is processing
-      const hasProcessing = query.state.data?.data.some((v) => v.status === 'processing')
+      const hasProcessing = query.state.data?.items.some((v) => v.status === 'processing')
       return hasProcessing ? 10_000 : false
     },
   })
@@ -84,7 +89,7 @@ export default function DashboardVideosPage() {
     onError: () => toast.error('Failed to delete video'),
   })
 
-  const videos = data?.data ?? []
+  const videos = data?.items ?? []
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -103,7 +108,7 @@ export default function DashboardVideosPage() {
             My Videos
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {data?.meta.total ?? 0} videos total
+            {data?.total ?? 0} videos total
           </p>
         </div>
         <Button onClick={() => setUploadOpen(true)} className="gap-2">
@@ -147,9 +152,11 @@ export default function DashboardVideosPage() {
                     <Video className="h-10 w-10 text-muted-foreground opacity-40" />
                   </div>
                 )}
-                <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
-                  {formatDuration(video.duration)}
-                </span>
+                {video.durationSeconds != null && (
+                  <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
+                    {formatDuration(video.durationSeconds)}
+                  </span>
+                )}
                 <div className="absolute top-2 left-2">
                   <StatusBadge status={video.status} />
                 </div>
@@ -166,11 +173,7 @@ export default function DashboardVideosPage() {
                   <span>{formatRelativeTime(video.createdAt)}</span>
                   <span className="flex items-center gap-1">
                     <Eye className="h-3 w-3" />
-                    {formatNumber(video.views)}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Heart className="h-3 w-3" />
-                    {formatNumber(video.likesCount)}
+                    {formatNumber(video.viewCount)}
                   </span>
                 </div>
 

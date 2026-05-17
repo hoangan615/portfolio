@@ -5,10 +5,6 @@ import * as Tabs from '@radix-ui/react-tabs'
 import {
   FileText,
   Video,
-  Heart,
-  Bookmark,
-  MapPin,
-  Globe,
   Calendar,
   Users,
 } from 'lucide-react'
@@ -19,13 +15,11 @@ import { QUERY_KEYS } from '@/lib/constants'
 import Avatar from '@/shared/components/Avatar'
 import FollowButton from './FollowButton'
 import PostCard from '@/shared/components/PostCard'
-import VideoCard from '@/shared/components/VideoCard'
 import InfiniteList from '@/shared/components/InfiniteList'
 import LoadingSpinner from '@/shared/components/LoadingSpinner'
 import type { Post } from '@/shared/api/posts'
-import type { Video as VideoType } from '@/shared/api/videos'
 
-type ProfileTab = 'posts' | 'videos'
+type ProfileTab = 'posts'
 
 interface UserProfileProps {
   username: string
@@ -46,23 +40,14 @@ export default function UserProfile({ username }: UserProfileProps) {
 
   const isOwner = currentUser?.username === username
 
-  // Posts infinite query
+  // Posts infinite query — needs user's UUID (id)
   const postsQuery = useInfiniteQuery({
     queryKey: QUERY_KEYS.userPosts(username),
     queryFn: ({ pageParam = 1 }) =>
-      usersApi.getUserPosts(username, { page: pageParam as number }),
-    getNextPageParam: (last, pages) => (last.meta.hasMore ? pages.length + 1 : undefined),
+      usersApi.getUserPosts(profile!.id, { page: pageParam as number }),
+    getNextPageParam: (last) => (last.hasNext ? last.page + 1 : undefined),
     initialPageParam: 1,
-    enabled: activeTab === 'posts',
-  })
-
-  const videosQuery = useInfiniteQuery({
-    queryKey: QUERY_KEYS.userVideos(username),
-    queryFn: ({ pageParam = 1 }) =>
-      usersApi.getUserVideos(username, { page: pageParam as number }),
-    getNextPageParam: (last, pages) => (last.meta.hasMore ? pages.length + 1 : undefined),
-    initialPageParam: 1,
-    enabled: activeTab === 'videos',
+    enabled: !!profile?.id && activeTab === 'posts',
   })
 
   if (isLoading) {
@@ -84,14 +69,12 @@ export default function UserProfile({ username }: UserProfileProps) {
     )
   }
 
-  const posts = postsQuery.data?.pages.flatMap((p) => p.data) ?? []
-  const videos = videosQuery.data?.pages.flatMap((p) => p.data) ?? []
+  const posts = postsQuery.data?.pages.flatMap((p) => p.items) ?? []
 
   const stats = [
-    { label: 'Posts', value: formatNumber(profile.postsCount), icon: FileText },
-    { label: 'Videos', value: formatNumber(profile.videosCount), icon: Video },
-    { label: 'Followers', value: formatNumber(profile.followersCount), icon: Users },
-    { label: 'Following', value: formatNumber(profile.followingCount), icon: Users },
+    { label: 'Posts', value: formatNumber(profile.postCount ?? 0), icon: FileText },
+    { label: 'Followers', value: formatNumber(profile.followerCount ?? 0), icon: Users },
+    { label: 'Following', value: formatNumber(profile.followingCount ?? 0), icon: Users },
   ]
 
   return (
@@ -118,8 +101,8 @@ export default function UserProfile({ username }: UserProfileProps) {
                 </Link>
               ) : (
                 <FollowButton
-                  username={profile.username}
-                  isFollowing={profile.isFollowing ?? false}
+                  userId={profile.id}
+                  isFollowing={false}
                 />
               )}
             </div>
@@ -127,7 +110,7 @@ export default function UserProfile({ username }: UserProfileProps) {
 
           {/* Name & username */}
           <div className="mb-3">
-            <h1 className="text-xl font-bold">{profile.displayName}</h1>
+            <h1 className="text-xl font-bold">{profile.displayName ?? profile.username}</h1>
             <p className="text-sm text-muted-foreground">@{profile.username}</p>
           </div>
 
@@ -138,14 +121,16 @@ export default function UserProfile({ username }: UserProfileProps) {
 
           {/* Meta */}
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mb-4">
-            <span className="flex items-center gap-1">
-              <Calendar className="h-3.5 w-3.5" />
-              Joined {formatDate(profile.createdAt, 'MMMM yyyy')}
-            </span>
+            {profile.createdAt && (
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5" />
+                Joined {formatDate(profile.createdAt, 'MMMM yyyy')}
+              </span>
+            )}
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {stats.map(({ label, value, icon: Icon }) => (
               <div
                 key={label}
@@ -167,7 +152,6 @@ export default function UserProfile({ username }: UserProfileProps) {
         <Tabs.List className="flex gap-1 rounded-xl bg-muted p-1 mb-6">
           {([
             { value: 'posts' as const, label: 'Posts', icon: FileText },
-            { value: 'videos' as const, label: 'Videos', icon: Video },
           ] as const).map(({ value, label, icon: Icon }) => (
             <Tabs.Trigger
               key={value}
@@ -195,24 +179,7 @@ export default function UserProfile({ username }: UserProfileProps) {
             isLoading={postsQuery.isLoading}
             emptyMessage={
               <p className="text-sm text-muted-foreground">
-                {isOwner ? "You haven't posted anything yet." : `${profile.displayName} hasn't posted yet.`}
-              </p>
-            }
-          />
-        </Tabs.Content>
-
-        <Tabs.Content value="videos" className="outline-none">
-          <InfiniteList
-            items={videos}
-            renderItem={(video) => <VideoCard video={video as VideoType} />}
-            hasNextPage={!!videosQuery.hasNextPage}
-            isFetchingNextPage={videosQuery.isFetchingNextPage}
-            fetchNextPage={videosQuery.fetchNextPage}
-            isLoading={videosQuery.isLoading}
-            grid
-            emptyMessage={
-              <p className="text-sm text-muted-foreground">
-                {isOwner ? "You haven't uploaded any videos yet." : `${profile.displayName} hasn't uploaded videos yet.`}
+                {isOwner ? "You haven't posted anything yet." : `${profile.displayName ?? profile.username} hasn't posted yet.`}
               </p>
             }
           />

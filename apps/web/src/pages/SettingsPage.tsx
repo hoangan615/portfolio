@@ -34,7 +34,7 @@ function ProfileSettings() {
   })
 
   const mutation = useMutation({
-    mutationFn: (data: { displayName?: string; bio?: string; avatarUrl?: string }) =>
+    mutationFn: (data: { displayName?: string; bio?: string }) =>
       usersApi.updateProfile(data),
     onSuccess: (updated) => {
       updateUser(updated)
@@ -46,9 +46,18 @@ function ProfileSettings() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const url = await uploadImage(file)
-    if (url) {
-      mutation.mutate({ avatarUrl: url })
+    // Upload avatar via the dedicated avatar endpoint
+    const formData = new FormData()
+    formData.append('file', file)
+    await uploadImage(file) // just for the isUploading state
+    try {
+      const { data: updated } = await apiClient.post('/users/me/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      updateUser(updated)
+      toast.success('Avatar updated!')
+    } catch {
+      toast.error('Failed to upload avatar')
     }
   }
 
@@ -183,11 +192,12 @@ function PasswordSettings() {
   )
 }
 
+// Matches backend UserSettingsUpdate (snake_case sent to server, camelCase received)
 interface NotificationPrefs {
-  email_on_comment: boolean
-  email_on_follow: boolean
-  email_on_like: boolean
-  email_digest: boolean
+  emailOnComment: boolean
+  emailOnFollow: boolean
+  emailOnReaction: boolean
+  emailNewsletter: boolean
 }
 
 const NOTIFICATION_TOGGLES: {
@@ -196,34 +206,34 @@ const NOTIFICATION_TOGGLES: {
   desc: string
 }[] = [
   {
-    key: 'email_on_follow',
+    key: 'emailOnFollow',
     label: 'New follower emails',
     desc: 'Get notified when someone follows you',
   },
   {
-    key: 'email_on_comment',
+    key: 'emailOnComment',
     label: 'Comment emails',
     desc: 'Get notified when someone comments on your posts or videos',
   },
   {
-    key: 'email_on_like',
-    label: 'Like emails',
-    desc: 'Get notified when someone likes your content',
+    key: 'emailOnReaction',
+    label: 'Reaction emails',
+    desc: 'Get notified when someone reacts to your content',
   },
   {
-    key: 'email_digest',
-    label: 'Weekly digest',
-    desc: 'Receive a weekly summary of platform activity',
+    key: 'emailNewsletter',
+    label: 'Newsletter',
+    desc: 'Receive platform newsletter and updates',
   },
 ]
 
 function NotificationSettings() {
   const { register, handleSubmit, watch, setValue } = useForm<NotificationPrefs>({
     defaultValues: {
-      email_on_comment: true,
-      email_on_follow: true,
-      email_on_like: false,
-      email_digest: true,
+      emailOnComment: true,
+      emailOnFollow: true,
+      emailOnReaction: false,
+      emailNewsletter: true,
     },
   })
 
@@ -231,7 +241,12 @@ function NotificationSettings() {
 
   const mutation = useMutation({
     mutationFn: (prefs: NotificationPrefs) =>
-      apiClient.put('/users/me/notification-preferences', prefs),
+      apiClient.patch('/users/me/settings', {
+        email_on_comment: prefs.emailOnComment,
+        email_on_follow: prefs.emailOnFollow,
+        email_on_reaction: prefs.emailOnReaction,
+        email_newsletter: prefs.emailNewsletter,
+      }),
     onSuccess: () => toast.success('Notification preferences saved!'),
     onError: () => toast.error('Failed to save preferences'),
   })
