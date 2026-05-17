@@ -1,37 +1,47 @@
 import apiClient from './client'
 import { buildQueryString } from '@/lib/utils'
 import { PAGINATION } from '@/lib/constants'
-import type { PaginatedResponse } from './posts'
-import type { Post } from './posts'
-import type { Video } from './videos'
+import type { PagedResponse } from './posts'
 
-export type FeedItem =
-  | { type: 'post'; data: Post }
-  | { type: 'video'; data: Video }
+// FeedItem matches the backend FeedItem schema (flat object, not a discriminated union)
+export interface FeedItem {
+  id: string
+  itemType: string   // "post" or "video" (snake->camel: item_type)
+  userId: string
+  title: string | null
+  slug: string | null
+  excerpt: string | null
+  coverImageUrl: string | null
+  thumbnailUrl: string | null
+  viewCount: number
+  publishedAt: string | null
+  createdAt: string
+}
 
-export interface FeedResponse extends PaginatedResponse<FeedItem> {}
+export type FeedPagedResponse = PagedResponse<FeedItem>
 
 export const feedApi = {
-  getGlobalFeed: async (page = 1): Promise<FeedResponse> => {
-    const qs = buildQueryString({ page, limit: PAGINATION.defaultLimit })
-    const { data } = await apiClient.get<FeedResponse>(`/feed/global${qs}`)
+  getGlobalFeed: async (page = 1): Promise<FeedPagedResponse> => {
+    const qs = buildQueryString({ page, page_size: PAGINATION.defaultLimit })
+    const { data } = await apiClient.get<FeedPagedResponse>(`/feed/global${qs}`)
     return data
   },
 
-  getFollowingFeed: async (page = 1): Promise<FeedResponse> => {
-    const qs = buildQueryString({ page, limit: PAGINATION.defaultLimit })
-    const { data } = await apiClient.get<FeedResponse>(`/feed/following${qs}`)
+  getFollowingFeed: async (page = 1): Promise<FeedPagedResponse> => {
+    const qs = buildQueryString({ page, page_size: PAGINATION.defaultLimit })
+    const { data } = await apiClient.get<FeedPagedResponse>(`/feed${qs}`)
     return data
   },
 
-  getTrendingFeed: async (): Promise<FeedItem[]> => {
-    const { data } = await apiClient.get<FeedItem[]>('/feed/trending')
+  getTrendingFeed: async (page = 1): Promise<FeedPagedResponse> => {
+    const qs = buildQueryString({ page, page_size: PAGINATION.defaultLimit })
+    const { data } = await apiClient.get<FeedPagedResponse>(`/feed/trending${qs}`)
     return data
   },
 
-  getExploreFeed: async (page = 1): Promise<FeedResponse> => {
-    const qs = buildQueryString({ page, limit: PAGINATION.defaultLimit })
-    const { data } = await apiClient.get<FeedResponse>(`/feed/explore${qs}`)
+  getExploreFeed: async (page = 1): Promise<FeedPagedResponse> => {
+    const qs = buildQueryString({ page, page_size: PAGINATION.defaultLimit })
+    const { data } = await apiClient.get<FeedPagedResponse>(`/feed/explore${qs}`)
     return data
   },
 }
