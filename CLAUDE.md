@@ -1,9 +1,9 @@
 # Portfolio Platform — Claude Code Context
 
 ## Project Overview
-Community platform monorepo: **Portfolio** (Võ Hoàng An) + **Tech Takeaway** community.
+Community platform monorepo: **Portfolio** (Võ Hoàng Ân) + **Tech Takeaway** community.
 
-- Owner: Võ Hoàng An | GitHub: [hoangan615](https://github.com/hoangan615)
+- Owner: Võ Hoàng Ân | GitHub: [hoangan615](https://github.com/hoangan615)
 - Platform: Full-Stack community sharing knowledge — posts, videos, comments, follow system
 - Backend: FastAPI (Python) | Frontend: React (TypeScript) | DB: PostgreSQL + Redis + MinIO
 
@@ -24,6 +24,21 @@ root/
 │   └── nginx/            Reverse proxy config
 └── docs/                 Documentation
 ```
+
+## Development Rules
+After every fix or code change, run the relevant test suite and fix any failures before finishing.
+
+**Backend** (`apps/api/`):
+- Quick run: `cd apps/api && pytest tests/ --tb=short -q`
+- Stop at first failure: `cd apps/api && pytest tests/ -x -q`
+- With coverage: `cd apps/api && pytest tests/ --cov=. --cov-report=term-missing -q`
+- Uses SQLite in-memory — no Docker needed.
+
+**Frontend** (`apps/web/`):
+- Run tests: `cd apps/web && pnpm test`
+- Watch mode: `cd apps/web && pnpm test:watch`
+- With coverage: `cd apps/web && pnpm test:coverage`
+- Stack: Vitest + React Testing Library + jsdom.
 
 ## Key Commands
 ```bash
@@ -97,7 +112,7 @@ apps/web/src/
 ## Routes
 | URL | Page |
 |-----|------|
-| `/` | Portfolio (Võ Hoàng An's personal page) |
+| `/` | Portfolio (Võ Hoàng Ân's personal page) |
 | `/community` | Tech Takeaway community feed |
 | `/watch/:id` | Video watch page (HLS player) |
 | `/post/:slug` | Blog post detail |

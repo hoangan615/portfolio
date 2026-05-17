@@ -401,7 +401,7 @@ describe('Sidebar', () => {
 
   it('renders footer attribution', () => {
     renderWithProviders(<Sidebar />)
-    expect(screen.getByText(/Võ Hoàng An/)).toBeInTheDocument()
+    expect(screen.getByText(/Võ Hoàng Ân/)).toBeInTheDocument()
   })
 })
 

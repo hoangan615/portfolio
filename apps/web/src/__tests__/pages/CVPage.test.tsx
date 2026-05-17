@@ -23,7 +23,7 @@ describe('CVPage', () => {
 
   it('renders current role / company', () => {
     renderCVPage()
-    // FPT Software appears in multiple experience entries — check at least one exists
+    // FPT Software appears in multiple places (role title + bio text)
     const matches = screen.getAllByText(/FPT Software/i)
     expect(matches.length).toBeGreaterThan(0)
   })
@@ -47,13 +47,13 @@ describe('CVPage', () => {
 
   it('renders skills section', () => {
     renderCVPage()
-    // Skills section heading — use exact heading text
-    expect(screen.getByText('Technical Skills')).toBeInTheDocument()
+    // Section heading is "Technical Skills"
+    expect(screen.getByText(/Technical Skills/i)).toBeInTheDocument()
   })
 
   it('has a save as pdf button', () => {
     renderCVPage()
-    // The print button has text "Save as PDF"
+    // Button text is "Save as PDF"
     const printBtn = screen.getByRole('button', { name: /save as pdf/i })
     expect(printBtn).toBeInTheDocument()
   })

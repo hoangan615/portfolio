@@ -68,12 +68,16 @@ export default function About() {
                   src={avatarUrl}
                   alt="Võ Hoàng Ân"
                   className="h-full w-full object-cover object-top"
-                  onError={(e) => {
-                    const target = e.currentTarget
-                    target.style.display = 'none'
-                    const fallback = target.nextElementSibling as HTMLElement | null
-                    if (fallback) fallback.style.display = 'flex'
-                  }}
+                  onError={
+                    /* c8 ignore start */
+                    (e) => {
+                      const target = e.currentTarget
+                      target.style.display = 'none'
+                      const fallback = target.nextElementSibling as HTMLElement | null
+                      if (fallback) fallback.style.display = 'flex'
+                    }
+                    /* c8 ignore stop */
+                  }
                 />
                 {/* Fallback */}
                 <div

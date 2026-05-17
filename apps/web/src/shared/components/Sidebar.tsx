@@ -122,7 +122,7 @@ export default function Sidebar({ className }: SidebarProps) {
             rel="noopener noreferrer"
             className="text-primary hover:underline font-medium"
           >
-            Võ Hoàng An
+            Võ Hoàng Ân
           </a>
           . Full-Stack Developer & Tech Lead.
         </p>

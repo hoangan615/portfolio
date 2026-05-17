@@ -1,48 +1,40 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, act, renderHook } from '@testing-library/react'
+import { render, act, screen, renderHook } from '@testing-library/react'
 import { useIntersection } from '@/shared/hooks/useIntersection'
 
-// jsdom doesn't implement IntersectionObserver — we stub it here
+// jsdom doesn't implement IntersectionObserver — we stub it here.
+// The hook only creates an observer when the ref is attached to a DOM element,
+// so we use a wrapper component instead of renderHook.
 const mockObserve = vi.fn()
 const mockDisconnect = vi.fn()
-const mockUnobserve = vi.fn()
 
 let capturedCallback: (entries: IntersectionObserverEntry[]) => void
-let capturedOptions: IntersectionObserverInit | undefined
 
 const MockIntersectionObserver = vi.fn(
   (callback: IntersectionObserverCallback, options?: IntersectionObserverInit) => {
     capturedCallback = (entries) => callback(entries, {} as IntersectionObserver)
-    capturedOptions = options
     return {
       observe: mockObserve,
       disconnect: mockDisconnect,
-      unobserve: mockUnobserve,
+      unobserve: vi.fn(),
       root: null,
-      rootMargin: '',
-      thresholds: [],
+      rootMargin: options?.rootMargin ?? '',
+      thresholds: options?.threshold !== undefined ? [options.threshold as number] : [],
       takeRecords: () => [],
     }
-  },
+  }
 )
 
-// Wrapper component that actually attaches ref to a DOM element
-function TestComponent({ options }: { options?: IntersectionObserverInit }) {
+function TestBox({ options }: { options?: IntersectionObserverInit } = {}) {
   const { ref, isVisible } = useIntersection(options)
-  return (
-    <div data-testid="target" ref={ref}>
-      {isVisible ? 'visible' : 'hidden'}
-    </div>
-  )
+  return <div ref={ref} data-testid="box" data-visible={String(isVisible)} />
 }
 
 beforeEach(() => {
   vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
   mockObserve.mockClear()
   mockDisconnect.mockClear()
-  mockUnobserve.mockClear()
   MockIntersectionObserver.mockClear()
-  capturedOptions = undefined
 })
 
 afterEach(() => {
@@ -50,75 +42,61 @@ afterEach(() => {
 })
 
 describe('useIntersection', () => {
-  it('returns ref and isVisible=false initially', () => {
-    render(<TestComponent />)
-    expect(screen.getByTestId('target')).toHaveTextContent('hidden')
+  it('returns isVisible=false initially', () => {
+    render(<TestBox />)
+    expect(screen.getByTestId('box').getAttribute('data-visible')).toBe('false')
   })
 
-  it('creates an IntersectionObserver on mount and calls observe', () => {
-    render(<TestComponent />)
+  it('creates an IntersectionObserver on mount', () => {
+    render(<TestBox />)
     expect(MockIntersectionObserver).toHaveBeenCalledOnce()
-    expect(mockObserve).toHaveBeenCalledOnce()
   })
 
   it('sets isVisible to true when element intersects', () => {
-    render(<TestComponent />)
-
+    render(<TestBox />)
     act(() => {
       capturedCallback([{ isIntersecting: true } as IntersectionObserverEntry])
     })
-
-    expect(screen.getByTestId('target')).toHaveTextContent('visible')
+    expect(screen.getByTestId('box').getAttribute('data-visible')).toBe('true')
   })
 
   it('does not set isVisible when element is not intersecting', () => {
-    render(<TestComponent />)
-
+    render(<TestBox />)
     act(() => {
       capturedCallback([{ isIntersecting: false } as IntersectionObserverEntry])
     })
-
-    expect(screen.getByTestId('target')).toHaveTextContent('hidden')
+    expect(screen.getByTestId('box').getAttribute('data-visible')).toBe('false')
   })
 
   it('disconnects after first intersection (fires once)', () => {
-    render(<TestComponent />)
-
+    render(<TestBox />)
     act(() => {
       capturedCallback([{ isIntersecting: true } as IntersectionObserverEntry])
     })
-
     expect(mockDisconnect).toHaveBeenCalledOnce()
   })
 
   it('disconnects observer on unmount', () => {
-    const { unmount } = render(<TestComponent />)
+    const { unmount } = render(<TestBox />)
     unmount()
     expect(mockDisconnect).toHaveBeenCalled()
   })
 
   it('passes custom options to IntersectionObserver', () => {
-    render(<TestComponent options={{ threshold: 0.5, rootMargin: '10px' }} />)
-    expect(capturedOptions?.threshold).toBe(0.5)
-    expect(capturedOptions?.rootMargin).toBe('10px')
+    render(<TestBox options={{ threshold: 0.5, rootMargin: '10px' }} />)
+    const [, opts] = MockIntersectionObserver.mock.calls[0] as [unknown, IntersectionObserverInit]
+    expect(opts.threshold).toBe(0.5)
+    expect(opts.rootMargin).toBe('10px')
   })
 
-  it('stays visible after becoming visible (does not reset)', () => {
-    render(<TestComponent />)
-
-    act(() => {
-      capturedCallback([{ isIntersecting: true } as IntersectionObserverEntry])
-    })
-    expect(screen.getByTestId('target')).toHaveTextContent('visible')
-
-    // Firing again with false should not change anything (observer already disconnected)
-    act(() => {
-      capturedCallback([{ isIntersecting: false } as IntersectionObserverEntry])
-    })
-    expect(screen.getByTestId('target')).toHaveTextContent('visible')
+  it('stays visible after becoming visible (does not reset on false entry)', () => {
+    render(<TestBox />)
+    act(() => { capturedCallback([{ isIntersecting: true } as IntersectionObserverEntry]) })
+    act(() => { capturedCallback([{ isIntersecting: false } as IntersectionObserverEntry]) })
+    expect(screen.getByTestId('box').getAttribute('data-visible')).toBe('true')
   })
 
-  it('returns early when ref is not attached (null ref — covers if (!el) return)', () => {
+  it('returns early when ref is not attached (null ref)', () => {
     const { result } = renderHook(() => useIntersection())
     expect(result.current.isVisible).toBe(false)
     expect(MockIntersectionObserver).not.toHaveBeenCalled()

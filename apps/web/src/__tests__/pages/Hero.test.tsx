@@ -11,6 +11,7 @@ vi.mock('@/shared/api/portfolio', () => ({
 }))
 
 import Hero from '@/features/portfolio/Hero'
+import { portfolioApi } from '@/shared/api/portfolio'
 
 function renderHero() {
   const client = new QueryClient({
@@ -55,5 +56,23 @@ describe('Hero — default profile (Võ Hoàng Ân)', () => {
     renderHero()
     const liLink = await screen.findByRole('link', { name: /linkedin/i })
     expect(liLink).toHaveAttribute('href', 'https://www.linkedin.com/in/an-vo-012359159/')
+  })
+
+  it('uses portfolio API data when available', async () => {
+    vi.mocked(portfolioApi.getPortfolio).mockResolvedValueOnce({
+      name: 'API Name',
+      title: 'API Title',
+      github: 'https://github.com/apiuser',
+      linkedin: 'https://linkedin.com/in/apiuser',
+      avatarUrl: null,
+      bio: null,
+      tagline: null,
+      tiktok: null,
+      company: null,
+      location: null,
+    } as any)
+    renderHero()
+    expect(await screen.findByText(/API Name/i)).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: /github/i })).toHaveAttribute('href', 'https://github.com/apiuser')
   })
 })

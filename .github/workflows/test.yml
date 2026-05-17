@@ -1,0 +1,151 @@
+name: Tests & Coverage
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "apps/api/**"
+      - "apps/web/**"
+      - ".github/workflows/test.yml"
+  push:
+    branches: [main, master]
+    paths:
+      - "apps/api/**"
+      - "apps/web/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    name: Run tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    defaults:
+      run:
+        working-directory: apps/api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: apps/api/requirements.txt
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y libmagic1
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ \
+            --cov=. \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:htmlcov \
+            --cov-config=pyproject.toml \
+            --tb=short \
+            -v \
+            --junitxml=test-results.xml
+        env:
+          DATABASE_URL: sqlite+aiosqlite:///./portfolio_test.db
+          SECRET_KEY: ci-test-secret-key-32-characters-long
+          APP_ENV: test
+          REDIS_URL: redis://localhost:6379/15
+          CELERY_BROKER_URL: memory://
+          CELERY_RESULT_BACKEND: cache+memory://
+
+      - name: Upload coverage XML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-xml
+          path: apps/api/coverage.xml
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-html
+          path: apps/api/htmlcov/
+
+      - name: Post coverage comment on PR
+        uses: MishaKav/pytest-coverage-comment@main
+        if: github.event_name == 'pull_request'
+        with:
+          pytest-xml-coverage-path: apps/api/coverage.xml
+          junitxml-path: apps/api/test-results.xml
+          title: "Test Coverage Report"
+          badge-title: Coverage
+          hide-comment: false
+          create-new-comment: false
+          hide-report: false
+          report-only-changed-files: false
+          unique-id-for-comment: backend-tests
+
+  test-web:
+    name: Frontend tests (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["20"]
+
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Run tests with coverage
+        run: pnpm test:coverage -- --reporter=verbose --reporter=junit --outputFile=test-results.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-coverage
+          path: apps/web/coverage/
+
+      - name: Post coverage comment on PR
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: github.event_name == 'pull_request'
+        with:
+          working-directory: apps/web
+          name: Frontend Coverage
+          json-summary-path: apps/web/coverage/coverage-summary.json
+          json-final-path: apps/web/coverage/coverage-final.json
