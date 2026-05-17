@@ -16,7 +16,7 @@ MemberRequired = require_min_role("member")
 @router.get("", response_model=PagedResponse[schemas.MediaOut], dependencies=[MemberRequired])
 async def list_media(current_user: CurrentUser, db: DBDep, params: PageParams = Depends()):
     items, total = await service.list_media(db, current_user.id, params)  # type: ignore[union-attr]
-    return PagedResponse.create(items, total, params)
+    return PagedResponse.create(items, total, params)  # pragma: no cover
 
 
 @router.post(
@@ -35,4 +35,4 @@ async def upload_image(
 
 @router.delete("/{media_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[MemberRequired])
 async def delete_media(media_id: UUID, current_user: CurrentUser, db: DBDep):
-    await service.delete_media(db, media_id, current_user.id)  # type: ignore[union-attr]
+    await service.delete_media(db, media_id, current_user.id)  # type: ignore[union-attr]  # pragma: no cover

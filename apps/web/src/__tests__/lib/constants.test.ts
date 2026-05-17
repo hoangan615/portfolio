@@ -25,6 +25,30 @@ describe('QUERY_KEYS', () => {
   it('feedInfinite without filter', () => {
     expect(QUERY_KEYS.feedInfinite()).toEqual(['feed', 'infinite', undefined])
   })
+
+  it('postComments key includes postId', () => {
+    expect(QUERY_KEYS.postComments('p1')).toEqual(['posts', 'p1', 'comments'])
+  })
+
+  it('videoComments key includes videoId', () => {
+    expect(QUERY_KEYS.videoComments('v1')).toEqual(['videos', 'v1', 'comments'])
+  })
+
+  it('userPosts key includes username', () => {
+    expect(QUERY_KEYS.userPosts('alice')).toEqual(['users', 'alice', 'posts'])
+  })
+
+  it('userVideos key includes username', () => {
+    expect(QUERY_KEYS.userVideos('alice')).toEqual(['users', 'alice', 'videos'])
+  })
+
+  it('followers key includes username', () => {
+    expect(QUERY_KEYS.followers('alice')).toEqual(['users', 'alice', 'followers'])
+  })
+
+  it('following key includes username', () => {
+    expect(QUERY_KEYS.following('alice')).toEqual(['users', 'alice', 'following'])
+  })
 })
 
 describe('ROUTES', () => {

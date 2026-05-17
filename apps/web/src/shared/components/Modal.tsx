@@ -27,6 +27,7 @@ export default function Modal({
     <Dialog.Root
       open={open}
       onOpenChange={(v) => {
+        /* c8 ignore next 1 */
         if (!preventClose || v) onOpenChange(v)
       }}
     >

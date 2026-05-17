@@ -191,6 +191,173 @@ async def test_create_project(
 
 
 @pytest.mark.asyncio
+async def test_list_skills(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    await _ensure_portfolio(db_session, regular_user)
+    response = await client.get("/api/v1/portfolio/skills", headers=auth_headers)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_update_skill(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    await _ensure_portfolio(db_session, regular_user)
+    skill = Skill(user_id=regular_user.id, name="Python", sort_order=0)
+    db_session.add(skill)
+    await db_session.flush()
+
+    response = await client.put(
+        f"/api/v1/portfolio/skills/{skill.id}",
+        json={"name": "Python 3", "proficiency": 95},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["name"] == "Python 3"
+
+
+@pytest.mark.asyncio
+async def test_list_experiences(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    await _ensure_portfolio(db_session, regular_user)
+    response = await client.get("/api/v1/portfolio/experiences", headers=auth_headers)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_update_experience(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    from modules.portfolio.models import Experience
+    await _ensure_portfolio(db_session, regular_user)
+    exp = Experience(
+        user_id=regular_user.id,
+        company="Old Corp",
+        title="Dev",
+        start_date="2020-01",
+        sort_order=0,
+    )
+    db_session.add(exp)
+    await db_session.flush()
+
+    response = await client.put(
+        f"/api/v1/portfolio/experiences/{exp.id}",
+        json={"company": "New Corp", "title": "Senior Dev", "start_date": "2020-01"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["company"] == "New Corp"
+
+
+@pytest.mark.asyncio
+async def test_delete_experience(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    from modules.portfolio.models import Experience
+    await _ensure_portfolio(db_session, regular_user)
+    exp = Experience(
+        user_id=regular_user.id,
+        company="Del Corp",
+        title="Dev",
+        start_date="2021-01",
+        sort_order=0,
+    )
+    db_session.add(exp)
+    await db_session.flush()
+
+    response = await client.delete(
+        f"/api/v1/portfolio/experiences/{exp.id}",
+        headers=auth_headers,
+    )
+    assert response.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_list_projects(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    await _ensure_portfolio(db_session, regular_user)
+    response = await client.get("/api/v1/portfolio/projects", headers=auth_headers)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_update_project(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    from modules.portfolio.models import Project
+    await _ensure_portfolio(db_session, regular_user)
+    project = Project(
+        user_id=regular_user.id,
+        title="Old Project",
+        sort_order=0,
+    )
+    db_session.add(project)
+    await db_session.flush()
+
+    response = await client.put(
+        f"/api/v1/portfolio/projects/{project.id}",
+        json={"title": "New Project", "description": "Updated"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == "New Project"
+
+
+@pytest.mark.asyncio
+async def test_delete_project(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    from modules.portfolio.models import Project
+    await _ensure_portfolio(db_session, regular_user)
+    project = Project(
+        user_id=regular_user.id,
+        title="To Delete",
+        sort_order=0,
+    )
+    db_session.add(project)
+    await db_session.flush()
+
+    response = await client.delete(
+        f"/api/v1/portfolio/projects/{project.id}",
+        headers=auth_headers,
+    )
+    assert response.status_code == 204
+
+
+# ── Contact ───────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
 async def test_contact_form(client: AsyncClient):
     response = await client.post(
         "/api/v1/portfolio/contact",

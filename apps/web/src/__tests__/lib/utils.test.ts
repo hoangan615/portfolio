@@ -207,6 +207,16 @@ describe('debounce', () => {
     vi.useRealTimers()
   })
 
+  it('passes args to the wrapped function', async () => {
+    vi.useFakeTimers()
+    const fn = vi.fn()
+    const debounced = debounce(fn, 50)
+    debounced('arg1', 'arg2')
+    vi.advanceTimersByTime(50)
+    expect(fn).toHaveBeenCalledWith('arg1', 'arg2')
+    vi.useRealTimers()
+  })
+
   it('calls only once for rapid invocations', async () => {
     vi.useFakeTimers()
     const fn = vi.fn()

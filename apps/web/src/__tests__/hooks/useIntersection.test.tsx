@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, act, screen } from '@testing-library/react'
+import { render, act, screen, renderHook } from '@testing-library/react'
 import { useIntersection } from '@/shared/hooks/useIntersection'
 
 // jsdom doesn't implement IntersectionObserver — we stub it here.
@@ -94,5 +94,11 @@ describe('useIntersection', () => {
     act(() => { capturedCallback([{ isIntersecting: true } as IntersectionObserverEntry]) })
     act(() => { capturedCallback([{ isIntersecting: false } as IntersectionObserverEntry]) })
     expect(screen.getByTestId('box').getAttribute('data-visible')).toBe('true')
+  })
+
+  it('returns early when ref is not attached (null ref)', () => {
+    const { result } = renderHook(() => useIntersection())
+    expect(result.current.isVisible).toBe(false)
+    expect(MockIntersectionObserver).not.toHaveBeenCalled()
   })
 })

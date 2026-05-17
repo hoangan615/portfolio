@@ -16,6 +16,7 @@ export default defineConfig({
       exclude: [
         // Test infrastructure
         'src/test/**',
+        'src/__tests__/**',
         'src/**/*.d.ts',
         'src/main.tsx',
         // App wiring — no logic to test

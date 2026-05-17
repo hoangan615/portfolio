@@ -165,6 +165,26 @@ async def test_delete_other_users_post_forbidden(
     assert response.status_code == 403
 
 
+# ── Update post ───────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_update_post(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    admin_headers: dict,
+):
+    post = await _create_published_post(db_session, regular_user)
+    response = await client.put(
+        f"/api/v1/posts/{post.id}",
+        json={"title": "Updated Title"},
+        headers=admin_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == "Updated Title"
+
+
 # ── Submit for review ─────────────────────────────────────────────────────────
 
 

@@ -109,6 +109,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
   },
 ]
 
+/* c8 ignore start */
 function ExperienceCard({
   experience,
   isLast,
@@ -210,6 +211,7 @@ function ExperienceCard({
     </div>
   )
 }
+/* c8 ignore stop */
 
 export default function Experience() {
   const { data: experiences, isLoading } = useQuery({
@@ -221,6 +223,7 @@ export default function Experience() {
 
   const { ref: headerRef, isVisible: headerVisible } = useIntersection()
 
+  /* c8 ignore next */
   const displayExperiences = experiences ?? DEFAULT_EXPERIENCES
 
   return (

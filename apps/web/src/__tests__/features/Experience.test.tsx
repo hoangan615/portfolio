@@ -12,6 +12,8 @@ import Experience from '@/features/portfolio/Experience'
 
 function renderExperience() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  // Pre-populate the cache so isLoading=false on first render and ExperienceCard renders synchronously
+  client.setQueryData(['experiences'], null)
   return render(
     <QueryClientProvider client={client}>
       <Experience />
@@ -20,6 +22,13 @@ function renderExperience() {
 }
 
 describe('Experience', () => {
+  it('shows loading spinner before data loads', () => {
+    // No pre-populated cache → isLoading=true → LoadingSpinner shows
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    render(<QueryClientProvider client={client}><Experience /></QueryClientProvider>)
+    expect(document.querySelector('.py-12')).toBeInTheDocument()
+  })
+
   it('renders "Work Experience" heading', async () => {
     renderExperience()
     expect(await screen.findByText(/Work Experience/i)).toBeInTheDocument()

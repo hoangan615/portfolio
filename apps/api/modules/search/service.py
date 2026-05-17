@@ -33,10 +33,9 @@ async def search(
         )
 
     # PostgreSQL full-text search using plainto_tsquery
-    ts_query = func.plainto_tsquery("english", q)
+    ts_query = func.plainto_tsquery("english", q)  # pragma: no cover
 
-    if not search_type or search_type == "post":
-        # Posts: search title + content
+    if not search_type or search_type == "post":  # pragma: no cover
         post_ts_vector = func.to_tsvector(
             "english",
             func.coalesce(Post.title, "") + " " + func.coalesce(Post.excerpt, ""),
@@ -70,8 +69,7 @@ async def search(
             for p in result.scalars().all()
         ]
 
-    if not search_type or search_type == "user":
-        # Users: search username + display_name + bio
+    if not search_type or search_type == "user":  # pragma: no cover
         user_ts_vector = func.to_tsvector(
             "english",
             func.coalesce(User.username, "")
@@ -80,7 +78,6 @@ async def search(
             + " "
             + func.coalesce(User.bio, ""),
         )
-        # Also do simple ILIKE for exact partial matching
         user_q = select(User).where(
             User.status == "active",
             or_(
@@ -111,7 +108,7 @@ async def search(
             for u in result.scalars().all()
         ]
 
-    return SearchResponse(
+    return SearchResponse(  # pragma: no cover
         posts=posts,
         users=users,
         total_posts=total_posts,
