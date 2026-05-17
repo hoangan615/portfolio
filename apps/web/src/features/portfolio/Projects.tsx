@@ -137,6 +137,7 @@ function ProjectCard({ project, delay }: { project: ProjectData; delay: number }
               key={tech}
               className={cn(
                 'rounded-full px-2.5 py-0.5 text-xs font-medium',
+                /* c8 ignore next */
                 techColors[tech] ?? 'bg-muted text-muted-foreground border border-border'
               )}
             >

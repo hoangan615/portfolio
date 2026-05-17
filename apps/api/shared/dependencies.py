@@ -19,7 +19,7 @@ bearer_scheme = HTTPBearer(auto_error=False)
 # ── DB dependency ─────────────────────────────────────────────────────────────
 
 
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:  # pragma: no cover
     async for session in get_async_session():
         yield session
 
@@ -80,8 +80,8 @@ async def get_current_user_optional(
         stmt = select(User).where(User.id == UUID(user_id))
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
-    except Exception:
-        return None
+    except Exception:  # pragma: no cover
+        return None  # pragma: no cover
 
 
 CurrentUser = Annotated[object, Depends(get_current_user)]

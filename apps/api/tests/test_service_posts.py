@@ -250,3 +250,53 @@ async def test_submit_already_published_raises(db_session: AsyncSession, regular
     post = await _make_post(db_session, regular_user, status="published")
     with pytest.raises(BadRequestError):
         await service.submit_for_review(db_session, post.id, regular_user.id)
+
+
+# ── create_post with categories and tags ─────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_create_post_with_category_and_tag(db_session: AsyncSession, regular_user: User):
+    import uuid
+    from modules.posts.models import Category, Tag
+    from modules.posts.schemas import PostCreate
+
+    cat = Category(id=uuid.uuid4(), name="Tech", slug="tech")
+    tag = Tag(id=uuid.uuid4(), name="Python", slug="python")
+    db_session.add(cat)
+    db_session.add(tag)
+    await db_session.flush()
+
+    data = PostCreate(
+        type="article",
+        title="Post with Categories",
+        content="<p>Content</p>",
+        category_ids=[cat.id],
+        tag_ids=[tag.id],
+    )
+    post = await service.create_post(db_session, regular_user.id, data)
+    assert post.title == "Post with Categories"
+
+
+# ── update_post with categories and tags ─────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_update_post_with_category_and_tag(db_session: AsyncSession, regular_user: User):
+    import uuid
+    from modules.posts.models import Category, Tag
+    from modules.posts.schemas import PostUpdate
+
+    cat = Category(id=uuid.uuid4(), name="Science", slug="science")
+    tag = Tag(id=uuid.uuid4(), name="Research", slug="research")
+    db_session.add(cat)
+    db_session.add(tag)
+    await db_session.flush()
+
+    post = await _make_post(db_session, regular_user, status="draft")
+    update = PostUpdate(
+        category_ids=[cat.id],
+        tag_ids=[tag.id],
+    )
+    updated = await service.update_post(db_session, post.id, update)
+    assert updated.id == post.id

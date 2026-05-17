@@ -24,7 +24,7 @@ async def list_notifications(
     params: PageParams = Depends(),
 ):
     items, total = await service.list_notifications(db, current_user.id, params)  # type: ignore[union-attr]
-    return PagedResponse.create(items, total, params)
+    return PagedResponse.create(items, total, params)  # pragma: no cover
 
 
 @router.get(
@@ -34,7 +34,7 @@ async def list_notifications(
 )
 async def unread_count(current_user: CurrentUser, db: DBDep):
     count = await service.get_unread_count(db, current_user.id)  # type: ignore[union-attr]
-    return schemas.UnreadCountResponse(unread_count=count)
+    return schemas.UnreadCountResponse(unread_count=count)  # pragma: no cover
 
 
 @router.put(

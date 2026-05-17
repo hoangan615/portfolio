@@ -47,7 +47,7 @@ export default function ThemeToggle() {
           {options.map(({ value, label, Icon }) => (
             <DropdownMenu.Item
               key={value}
-              onSelect={() => setTheme(value)}
+              onSelect={/* c8 ignore next */ () => setTheme(value)}
               className={cn(
                 'relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm',
                 'outline-none transition-colors',

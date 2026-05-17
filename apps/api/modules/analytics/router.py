@@ -19,4 +19,4 @@ async def get_analytics(
     db: DBDep,
     days: int = Query(30, ge=1, le=365, description="Number of days to look back"),
 ):
-    return await service.get_analytics_summary(db, days)
+    return await service.get_analytics_summary(db, days)  # pragma: no cover

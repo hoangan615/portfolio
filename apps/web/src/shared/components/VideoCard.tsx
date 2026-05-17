@@ -58,7 +58,7 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
       </Link>
 
       {/* Info */}
-      <div className={cn('flex gap-2', compact ? 'items-start' : 'items-start')}>
+      <div className={cn('flex gap-2', 'items-start')}>
         <div className="flex-1 min-w-0">
           <Link to={ROUTES.watch(video.id)}>
             <h3
@@ -72,7 +72,7 @@ export default function VideoCard({ video, className, compact = false }: VideoCa
             </h3>
           </Link>
 
-          <div className={cn('mt-1 flex flex-col gap-0.5', compact ? 'text-xs' : 'text-xs')}>
+          <div className={cn('mt-1 flex flex-col gap-0.5', 'text-xs')}>
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <span className="flex items-center gap-0.5">
                 <Eye className="h-3 w-3" />

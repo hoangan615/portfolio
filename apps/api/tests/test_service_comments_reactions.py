@@ -281,6 +281,14 @@ async def test_add_bookmark_duplicate_raises(db_session: AsyncSession, regular_u
 
 
 @pytest.mark.asyncio
+async def test_remove_bookmark_success(db_session: AsyncSession, regular_user: User):
+    post = await _make_post(db_session, regular_user)
+    data = BookmarkCreate(content_type="post", content_id=post.id)
+    bookmark = await reaction_service.add_bookmark(db_session, regular_user.id, data)
+    await reaction_service.remove_bookmark(db_session, regular_user.id, bookmark.id)
+
+
+@pytest.mark.asyncio
 async def test_remove_bookmark_not_found(db_session: AsyncSession, regular_user: User):
     with pytest.raises(NotFoundError):
         await reaction_service.remove_bookmark(db_session, regular_user.id, uuid.uuid4())
@@ -296,3 +304,45 @@ async def test_list_bookmarks_with_filter(db_session: AsyncSession, regular_user
     bookmarks = await reaction_service.list_bookmarks(db_session, regular_user.id, content_type="post")
     assert len(bookmarks) >= 1
     assert all(b.content_type == "post" for b in bookmarks)
+
+
+# ── remove_reaction ───────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_remove_reaction_success(db_session: AsyncSession, regular_user: User):
+    post = await _make_post(db_session, regular_user)
+    data = ReactionCreate(content_type="post", content_id=post.id, emoji="👍")
+    reaction = await reaction_service.add_reaction(db_session, regular_user.id, data)
+    # Should not raise
+    await reaction_service.remove_reaction(db_session, regular_user.id, reaction.id)
+
+
+@pytest.mark.asyncio
+async def test_remove_reaction_not_found(db_session: AsyncSession, regular_user: User):
+    with pytest.raises(NotFoundError):
+        await reaction_service.remove_reaction(db_session, regular_user.id, uuid.uuid4())
+
+
+# ── users service: get_or_create_settings create branch ───────────────────────
+
+
+@pytest.mark.asyncio
+async def test_get_or_create_settings_creates_when_missing(db_session: AsyncSession):
+    from modules.users.models import User as UserModel
+    from modules.users import service as user_service
+    from core.security import hash_password as hp
+
+    user = UserModel(
+        username="nosettings_user",
+        email="nosettings@example.com",
+        password_hash=hp("Pass123!"),
+        role="member",
+        status="active",
+        email_verified=True,
+    )
+    db_session.add(user)
+    await db_session.flush()
+    # Do NOT create UserSettings - test the creation branch
+    settings = await user_service.get_or_create_settings(db_session, user.id)
+    assert settings.user_id == user.id

@@ -9,6 +9,7 @@ vi.mock('@/shared/api/portfolio', () => ({
 }))
 
 import About from '@/features/portfolio/About'
+import { portfolioApi } from '@/shared/api/portfolio'
 
 function renderAbout() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -55,5 +56,13 @@ describe('About', () => {
   it('renders inside section#about', () => {
     renderAbout()
     expect(document.querySelector('section#about')).toBeInTheDocument()
+  })
+
+  it('uses custom avatarUrl from portfolio API', () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    client.setQueryData(['portfolio'], { avatarUrl: 'https://example.com/photo.jpg' })
+    render(<QueryClientProvider client={client}><About /></QueryClientProvider>)
+    const img = screen.getByAltText(/Võ Hoàng Ân/i)
+    expect(img).toHaveAttribute('src', 'https://example.com/photo.jpg')
   })
 })

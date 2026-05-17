@@ -301,3 +301,120 @@ def test_get_github_auth_url():
     assert "github.com" in url
     assert "gh-state-456" in url
     assert "user:email" in url
+
+
+# ── refresh_tokens edge cases ────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_refresh_tokens_expired(db_session: AsyncSession, regular_user: User):
+    from datetime import timezone
+    from modules.users.models import RefreshToken
+    from core.security import create_refresh_token, hash_password as _hp
+    import hashlib
+
+    raw = create_refresh_token(regular_user.id)
+    token_hash = hashlib.sha256(raw.encode()).hexdigest()
+    past = datetime(2020, 1, 1, tzinfo=UTC)
+    expired_token = RefreshToken(
+        user_id=regular_user.id,
+        token_hash=token_hash,
+        expires_at=past,
+        revoked=False,
+    )
+    db_session.add(expired_token)
+    await db_session.flush()
+
+    with pytest.raises(UnauthorizedError, match="expired"):
+        await auth_service.refresh_tokens(db_session, raw)
+
+
+@pytest.mark.asyncio
+async def test_refresh_tokens_revoked_token(db_session: AsyncSession, regular_user: User):
+    from modules.auth.schemas import LoginRequest
+    schema = LoginRequest(email=regular_user.email, password="Password123!")
+    resp = await auth_service.login(db_session, schema)
+
+    # Revoke the token
+    await auth_service.logout(db_session, resp.refresh_token)
+
+    with pytest.raises(UnauthorizedError):
+        await auth_service.refresh_tokens(db_session, resp.refresh_token)
+
+
+# ── verify_email edge cases ───────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_verify_email_user_not_found(db_session: AsyncSession):
+    import uuid
+    from core.security import create_email_verification_token as civt
+    token = civt(uuid.uuid4())  # nonexistent user ID
+    from shared.exceptions import NotFoundError
+    with pytest.raises(NotFoundError):
+        await auth_service.verify_email(db_session, token)
+
+
+@pytest.mark.asyncio
+async def test_verify_email_guest_role_becomes_member(db_session: AsyncSession):
+    user = User(
+        username="guestverify",
+        email="guestverify@example.com",
+        password_hash=hash_password("Pass123!"),
+        role="guest",
+        status="pending",
+        email_verified=False,
+    )
+    db_session.add(user)
+    await db_session.flush()
+
+    from core.security import create_email_verification_token as civt
+    token = civt(user.id)
+    verified = await auth_service.verify_email(db_session, token)
+    assert verified.role == "member"
+    assert verified.email_verified is True
+
+
+# ── reset_password user not found ─────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_reset_password_user_not_found(db_session: AsyncSession):
+    import uuid
+    from core.security import create_password_reset_token
+    token = create_password_reset_token(uuid.uuid4())
+    from shared.exceptions import NotFoundError
+    from modules.auth.schemas import ResetPasswordRequest as RPR
+    schema = RPR(token=token, new_password="NewPass456!")
+    with pytest.raises(NotFoundError):
+        await auth_service.reset_password(db_session, schema)
+
+
+# ── send_verification_email dev path ─────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_send_verification_email_dev_logs(regular_user: User):
+    from unittest.mock import patch
+    from core.config import settings as cfg
+
+    original = cfg.APP_ENV
+    try:
+        cfg.APP_ENV = "development"
+        # Should log and return without sending SMTP
+        await auth_service.send_verification_email(regular_user)
+    finally:
+        cfg.APP_ENV = original
+
+
+@pytest.mark.asyncio
+async def test_send_password_reset_email_dev_logs(regular_user: User):
+    from core.config import settings as cfg
+
+    original = cfg.APP_ENV
+    try:
+        cfg.APP_ENV = "development"
+        token = "test-reset-token"
+        await auth_service.send_password_reset_email(regular_user, token)
+    finally:
+        cfg.APP_ENV = original

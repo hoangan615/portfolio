@@ -37,12 +37,23 @@ Object.defineProperty(window, 'matchMedia', {
 Object.defineProperty(window, 'print', { value: vi.fn(), writable: true })
 
 // ── IntersectionObserver (not implemented in jsdom) ───────────────────────────
+// Fires the callback immediately on observe() so animation branches (isVisible)
+// get exercised in feature component tests. Tests that need custom behavior
+// (useIntersection.test.tsx) override this via vi.stubGlobal in beforeEach.
 class MockIntersectionObserver {
-  observe = vi.fn()
+  private readonly cb: IntersectionObserverCallback
   disconnect = vi.fn()
   unobserve = vi.fn()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(_cb: IntersectionObserverCallback, _opts?: IntersectionObserverInit) {}
+  observe: (element: Element) => void
+  constructor(cb: IntersectionObserverCallback, _opts?: IntersectionObserverInit) {
+    this.cb = cb
+    this.observe = (element: Element) => {
+      this.cb(
+        [{ isIntersecting: true, target: element } as IntersectionObserverEntry],
+        this as unknown as IntersectionObserver
+      )
+    }
+  }
 }
 Object.defineProperty(window, 'IntersectionObserver', {
   writable: true,

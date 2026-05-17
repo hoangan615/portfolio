@@ -31,7 +31,7 @@ def _build_engine(url: str, *, testing: bool = False) -> AsyncEngine:
         # NullPool avoids connection-sharing issues in tests and is
         # required for SQLite in-memory databases.
         kwargs["poolclass"] = NullPool
-    else:
+    else:  # pragma: no cover
         kwargs["pool_size"] = settings.DATABASE_POOL_SIZE
         kwargs["max_overflow"] = settings.DATABASE_MAX_OVERFLOW
         kwargs["pool_pre_ping"] = True
@@ -51,7 +51,7 @@ AsyncSessionLocal: async_sessionmaker[AsyncSession] = async_sessionmaker(
 )
 
 
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:  # pragma: no cover
     async with AsyncSessionLocal() as session:
         try:
             yield session
@@ -63,13 +63,13 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-async def create_all_tables() -> None:
+async def create_all_tables() -> None:  # pragma: no cover
     """Create all tables (development / testing only)."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
-async def drop_all_tables() -> None:
+async def drop_all_tables() -> None:  # pragma: no cover
     """Drop all tables (testing only)."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

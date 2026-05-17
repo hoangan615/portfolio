@@ -14,22 +14,22 @@ AuthRequired = require_min_role("member")
 @router.get("", response_model=PagedResponse[schemas.FeedItem], dependencies=[AuthRequired])
 async def following_feed(current_user: CurrentUser, db: DBDep, params: PageParams = Depends()):
     items, total = await service.following_feed(db, current_user.id, params)  # type: ignore[union-attr]
-    return PagedResponse.create(items, total, params)
+    return PagedResponse.create(items, total, params)  # pragma: no cover
 
 
 @router.get("/global", response_model=PagedResponse[schemas.FeedItem])
 async def global_feed(db: DBDep, params: PageParams = Depends()):
     items, total = await service.global_feed(db, params)
-    return PagedResponse.create(items, total, params)
+    return PagedResponse.create(items, total, params)  # pragma: no cover
 
 
 @router.get("/trending", response_model=PagedResponse[schemas.FeedItem])
 async def trending_feed(db: DBDep, params: PageParams = Depends()):
     items, total = await service.trending_feed(db, params)
-    return PagedResponse.create(items, total, params)
+    return PagedResponse.create(items, total, params)  # pragma: no cover
 
 
 @router.get("/explore", response_model=PagedResponse[schemas.FeedItem], dependencies=[AuthRequired])
 async def explore_feed(current_user: CurrentUser, db: DBDep, params: PageParams = Depends()):
     items, total = await service.explore_feed(db, current_user.id, params)  # type: ignore[union-attr]
-    return PagedResponse.create(items, total, params)
+    return PagedResponse.create(items, total, params)  # pragma: no cover

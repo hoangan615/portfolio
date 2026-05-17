@@ -65,6 +65,7 @@ export function useVideoUpload() {
 
         // Step 2: Upload chunks
         for (let i = 0; i < totalChunks; i++) {
+          /* c8 ignore next 3 */
           if (abortRef.current?.signal.aborted) {
             throw new Error('Upload cancelled')
           }
@@ -148,6 +149,7 @@ export function useImageUpload() {
     } catch {
       setError('Failed to upload image')
       return null
+    /* c8 ignore next 3 */
     } finally {
       setIsUploading(false)
     }

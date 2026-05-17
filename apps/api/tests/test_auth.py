@@ -242,3 +242,52 @@ async def test_reset_password_invalid_token(client: AsyncClient):
         json={"token": "bad.token.here", "new_password": "NewPass123!"},
     )
     assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_reset_password_success(client: AsyncClient, regular_user: User):
+    from core.security import create_password_reset_token
+    token = create_password_reset_token(regular_user.id)
+    response = await client.post(
+        "/api/v1/auth/reset-password",
+        json={"token": token, "new_password": "NewPass123!"},
+    )
+    assert response.status_code == 200
+    assert "message" in response.json()
+
+
+# ── OAuth URL endpoints ────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_google_auth_url(client: AsyncClient):
+    response = await client.get("/api/v1/auth/google")
+    assert response.status_code == 200
+    body = response.json()
+    assert "url" in body
+    assert "state" in body
+    assert "accounts.google.com" in body["url"]
+
+
+@pytest.mark.asyncio
+async def test_github_auth_url(client: AsyncClient):
+    response = await client.get("/api/v1/auth/github")
+    assert response.status_code == 200
+    body = response.json()
+    assert "url" in body
+    assert "state" in body
+    assert "github.com" in body["url"]
+
+
+@pytest.mark.asyncio
+async def test_refresh_with_cookie(client: AsyncClient, regular_user: User):
+    login_resp = await client.post(
+        "/api/v1/auth/login",
+        json={"email": regular_user.email, "password": "Password123!"},
+    )
+    assert login_resp.status_code == 200
+    # Cookie is set by the login response; refresh using the cookie
+    refresh_resp = await client.post("/api/v1/auth/refresh")
+    assert refresh_resp.status_code == 200
+    body = refresh_resp.json()
+    assert "access_token" in body

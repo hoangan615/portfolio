@@ -159,3 +159,86 @@ async def test_update_settings(client: AsyncClient, auth_headers: dict):
     )
     assert response.status_code == 200
     assert response.json()["email_on_follow"] is False
+
+
+# ── POST /users/me/change-password ───────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_change_password(client: AsyncClient, auth_headers: dict):
+    response = await client.post(
+        "/api/v1/users/me/change-password",
+        json={"current_password": "Password123!", "new_password": "NewPass456!"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_change_password_wrong_current(client: AsyncClient, auth_headers: dict):
+    response = await client.post(
+        "/api/v1/users/me/change-password",
+        json={"current_password": "WrongPass!", "new_password": "NewPass456!"},
+        headers=auth_headers,
+    )
+    assert response.status_code in (400, 401)
+
+
+# ── DELETE /users/me ──────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_delete_account(client: AsyncClient, auth_headers: dict):
+    response = await client.delete("/api/v1/users/me", headers=auth_headers)
+    assert response.status_code == 204
+
+
+# ── GET /users/{user_id}/follow-status ───────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_follow_status(
+    client: AsyncClient,
+    regular_user: User,
+    second_user: User,
+    auth_headers: dict,
+):
+    response = await client.get(
+        f"/api/v1/users/{second_user.id}/follow-status",
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert "is_following" in body
+    assert "follower_count" in body
+    assert body["is_following"] is False
+
+
+# ── GET /users/{user_id}/followers ───────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_get_followers(
+    client: AsyncClient,
+    second_user: User,
+):
+    response = await client.get(f"/api/v1/users/{second_user.id}/followers")
+    assert response.status_code == 200
+    body = response.json()
+    assert "items" in body
+    assert "total" in body
+
+
+# ── GET /users/{user_id}/following ───────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_get_following(
+    client: AsyncClient,
+    second_user: User,
+):
+    response = await client.get(f"/api/v1/users/{second_user.id}/following")
+    assert response.status_code == 200
+    body = response.json()
+    assert "items" in body
+    assert "total" in body
