@@ -14,72 +14,92 @@ const CONTACT = {
 
 const EXPERIENCE = [
   {
-    role: 'Sub Project Lead',
+    role: 'Sub Project Lead / AI Engineer',
     company: 'FPT Software',
     period: 'Dec 2024 — Present',
-    tech: '.NET Core · Angular · Azure · LLM · OCR · AI · ABBYY',
+    tech: '.NET Core · .NET 8 · Angular · Azure OpenAI · Azure Document Intelligence · GitHub Copilot · LangChain · RAG · OCR (ABBYY) · SQLServer · MongoDB · Redis · RabbitMQ · Elasticsearch',
     bullets: [
-      'Leading a 30-engineer team delivering an AI-powered document intelligence platform for Japanese enterprise clients.',
-      'Integrated Azure Cognitive Services and large language models to automate document classification, extraction, and validation — reducing manual data entry by 80%.',
-      'Achieved 98% OCR accuracy on production data through custom preprocessing pipelines and model fine-tuning.',
-      'Facilitated requirements alignment between the Vietnamese engineering team and Japanese stakeholders.',
+      'Built and deployed custom GitHub Copilot agents in VS Code: code generation for .NET & ReactJS (−15–25% implementation effort), automated code review & refactoring (−20–30% review time, −40% review-related bugs), and unit test (xUnit) generation (−40% UT creation effort).',
+      'Leveraged Azure OpenAI and Azure Document Intelligence to enhance the core data capture engine, increasing accuracy to 99% on production documents.',
+      'Architected a RAG-powered AI Chatbot from a knowledge base of user manuals, architectural docs, FAQs, and resolved issues — significantly reducing customer support tickets.',
+      'Led the AI feature sub-team across a 60-member organisation: requirements analysis, technical solutions, code reviews, and bi-weekly reporting to Japanese stakeholders.',
+    ],
+  },
+  {
+    role: 'Sub Leader',
+    company: 'FPT Software',
+    period: 'Jan 2026 — Apr 2026',
+    tech: '.NET Framework · VB.NET · SQL Server',
+    bullets: [
+      'Concurrent assignment within a 112-member project delivering a Carton Production Management System for a Japanese manufacturing client.',
+      'Delivered feature development and code reviews aligned to detailed design specifications on a legacy .NET Framework / VB.NET stack.',
     ],
   },
   {
     role: 'Sub Project Lead',
     company: 'FPT Software',
     period: 'Jul 2023 — Nov 2024',
-    tech: 'SpringBoot · ReactJS · React Native · GCP · PostgreSQL',
+    tech: 'Java · SpringBoot · Angular · ReactJS · React Native · GCP · SQLServer · Redis',
     bullets: [
-      'Led a 28-engineer cross-functional team across web (ReactJS) and mobile (React Native) platforms for a Japanese real estate client.',
-      'Shortened contract processing cycles from 7 days to 1 day by implementing integrated digital signature workflows.',
-      'Eliminated 95% of paper-based processes through a comprehensive digitisation and compliance-reporting system.',
-      'Delivered a construction progress monitoring module with real-time dashboards and photo evidence tracking.',
+      'Led a 28-engineer cross-functional team delivering real estate contract management and construction monitoring systems for a Japanese property developer.',
+      'Compressed contract processing from 7 days to 1 day (7×) via integrated e-signature; eliminated 95% of paper-based approval workflows.',
+      'Delivered a real-time construction monitoring module with geo-tagged photo evidence, milestone dashboards, and automated stakeholder notifications.',
+      'Introduced shared component libraries that accelerated feature delivery by 30%.',
     ],
   },
   {
     role: 'Sub Project Lead',
     company: 'FPT Software',
     period: 'Apr 2020 — Jul 2023',
-    tech: 'ReactJS · React Native · .NET Core · Azure · AWS · Blockchain',
+    tech: 'ReactJS · React Native · .NET Core · ABP · Azure · AWS · Blockchain · PostgreSQL · MySQL · MongoDB · RabbitMQ · Redis',
     bullets: [
-      'Managed a 50-engineer team architecting a blockchain-based enterprise loyalty ecosystem connecting 50+ partner organisations.',
-      'Grew digital transaction volume by 3× over the legacy system through improved UX and near-real-time point settlement.',
-      'Designed microservice architecture across Azure and AWS; oversaw CI/CD pipelines and on-call rotation for a production SLA of 99.9%.',
-      'Delivered consumer-facing web and mobile apps alongside merchant admin portals and a back-office management suite.',
+      'Directed a 50-engineer organisation building a blockchain-based loyalty ecosystem connecting 50+ enterprise partners.',
+      'Grew digital transaction volume 3× over the legacy system within the first year; maintained 99.9% SLA with under four hours MTTR.',
+      'Built consumer web and mobile apps, merchant portal, and back-office suite on a shared design system — cutting UI development time by 40%.',
     ],
   },
   {
     role: 'Core Member',
     company: 'FPT Software',
     period: 'Feb 2018 — Apr 2020',
-    tech: '.NET Core · ABBYY · Angular',
+    tech: '.NET Core · ABBYY FineReader Engine · Angular · SQLServer · MongoDB · Elasticsearch · Redis · RabbitMQ · Hangfire · Azure',
     bullets: [
-      'Contributed to a 20-engineer team building an OCR document processing system integrated with ABBYY FlexiCapture.',
-      'Optimised recognition speed by 40% and reduced error rates to below 2% through image-preprocessing and post-processing algorithms.',
-      'Developed Angular-based operator review interfaces for manual quality-control workflows.',
+      'Engineered a fully automated OCR ingestion pipeline processing tens of thousands of pages per day with multi-format support.',
+      'Improved recognition throughput by 40% and reduced character error rates below 2% via parallel processing and post-processing algorithms.',
+      'Built Angular-based operator interfaces with batch-editing and QC dashboards, reducing manual review time per document by 35%.',
+    ],
+  },
+  {
+    role: 'Project Manager',
+    company: 'FPT Software',
+    period: 'Feb 2019 — Apr 2019',
+    tech: 'C · C++ · QT Creator · macOS · Windows',
+    bullets: [
+      'Managed upgrade of a legacy virtual printer driver to modern macOS and Windows APIs for a Japanese hardware client (5-member team).',
+      'Resolved a critical macOS device testing blocker enabling on-time delivery; achieved a perfect 100 CSS (Customer Satisfaction Score).',
     ],
   },
   {
     role: 'Team Lead',
     company: 'FPT Software',
     period: 'Nov 2015 — Dec 2017',
-    tech: '.NET · C# · DICOM · WPF',
+    tech: '.NET · C# · WPF · WCF · SQL Server · C++ · Git · SVN',
     bullets: [
-      'Led a 40-engineer team delivering a DICOM-compliant medical imaging platform (CT/MRI) for the Japanese healthcare market.',
-      'Doubled CT scan rendering resolution compared to the previous release through GPU-accelerated rendering optimisations.',
-      'Served as primary technical liaison with on-site Japanese medical professionals and regulatory reviewers.',
+      'Led a 40-engineer team delivering a DICOM-compliant CT/MRI imaging platform for the Japanese healthcare market.',
+      'Implemented volume rendering algorithms that doubled CT scan resolution, meaningfully improving diagnostic clarity for radiologists.',
+      'Delivered a PACS integration layer reducing image retrieval from minutes to seconds; zero critical defects in clinical validation.',
     ],
   },
 ]
 
 const SKILLS = [
-  { cat: 'Backend', items: ['.NET Core (Expert)', 'C# (Expert)', 'SpringBoot (Intermediate)', 'Node.js (Advanced)'] },
-  { cat: 'Frontend', items: ['ReactJS (Expert)', 'Angular (Advanced)', 'TypeScript (Expert)', 'HTML/CSS (Expert)'] },
-  { cat: 'Mobile', items: ['React Native (Expert)'] },
-  { cat: 'Cloud & DevOps', items: ['Azure (Advanced)', 'AWS (Intermediate)', 'GCP (Intermediate)', 'Docker (Advanced)', 'CI/CD (Advanced)'] },
-  { cat: 'Database', items: ['MSSQL (Advanced)', 'PostgreSQL (Advanced)', 'MongoDB (Advanced)', 'MySQL (Advanced)', 'Redis (Advanced)'] },
-  { cat: 'Tools', items: ['RabbitMQ (Advanced)', 'Elasticsearch (Intermediate)', 'Hangfire (Advanced)', 'Blockchain (Intermediate)'] },
+  { cat: 'AI & LLM', items: ['Azure OpenAI (Expert)', 'GitHub Copilot Agent Dev (Expert)', 'Azure Document Intelligence (Expert)', 'LangChain / RAG (Advanced)', 'ABBYY Fine Reader (Advanced)'] },
+  { cat: 'Backend', items: ['.NET Core / .NET 8 (Expert)', 'C# (Expert)', 'Entity Framework (Advanced)', 'Node.js (Advanced)', 'Spring Boot (Intermediate)'] },
+  { cat: 'Frontend', items: ['Angular (Advanced)', 'ReactJS (Advanced)', 'TypeScript (Expert)', 'HTML / CSS (Expert)'] },
+  { cat: 'Mobile', items: ['React Native (Advanced)'] },
+  { cat: 'Cloud & DevOps', items: ['Azure (Advanced)', 'AWS (Intermediate)', 'GCP (Intermediate)', 'Docker (Advanced)'] },
+  { cat: 'Database', items: ['MSSQL (Advanced)', 'MySQL (Advanced)', 'MongoDB (Advanced)', 'Elasticsearch (Advanced)', 'Redis (Advanced)'] },
+  { cat: 'Tools', items: ['RabbitMQ (Advanced)', 'Azure Service Bus (Advanced)', 'Hangfire (Advanced)', 'Datadog / Sentry (Intermediate)'] },
 ]
 
 const LANGUAGES = [
@@ -131,7 +151,7 @@ export default function CVPage() {
           <div className="flex-1">
             <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">Võ Hoàng Ân</h1>
             <p className="text-base font-semibold text-blue-600 mt-0.5">
-              Full-Stack Developer &amp; Sub Project Lead · FPT Software
+              .NET Developer &amp; Technical Lead · FPT Software
             </p>
 
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-600">
@@ -158,14 +178,14 @@ export default function CVPage() {
           <section>
             <h2 className="cv-section-title">Professional Summary</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Seasoned Full-Stack Software Engineer and Tech Lead with over <strong>10 years</strong> of professional experience
-              delivering enterprise-grade web and mobile applications at FPT Software. Proven track record of leading
-              cross-functional teams of <strong>20–50 engineers</strong> across complex, high-stakes engagements for
-              Japanese enterprise clients. Deep expertise in <strong>.NET/C#</strong>, <strong>ReactJS</strong>,{' '}
-              <strong>React Native</strong>, and cloud platforms (Azure, AWS, GCP). Experienced in AI/OCR integration,
-              blockchain architecture, real estate tech, and medical imaging systems. Multilingual communicator
-              (Vietnamese · English B1 · Japanese N4) with strong cross-cultural collaboration skills. Open to fully
-              remote opportunities or on-site roles in Cần Thơ, Vietnam.
+              Results-driven Technical Lead and AI Engineer with over <strong>10 years</strong> of professional experience
+              at FPT Software. Specializes in leveraging AI and Large Language Models to optimize the SDLC — with
+              hands-on expertise building custom <strong>GitHub Copilot agents</strong> that automate code generation,
+              automated code reviews, refactoring, and unit test creation. Deep expertise in the{' '}
+              <strong>.NET ecosystem</strong> (C#, .NET Core, .NET 8) combined with applied AI engineering:{' '}
+              <strong>Azure OpenAI</strong>, Azure Document Intelligence, LangChain, and RAG architectures.
+              Has managed teams of up to <strong>60 engineers</strong> across enterprise projects for Japanese clients.
+              Multilingual: Vietnamese (Native) · English (B1) · Japanese (N4).
             </p>
           </section>
 
@@ -235,12 +255,14 @@ export default function CVPage() {
           <section>
             <h2 className="cv-section-title">Certifications &amp; Training</h2>
             <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-gray-600">
-              <span>▸ Microsoft Azure Developer Associate</span>
-              <span>▸ Microsoft Azure Fundamentals (AZ-900)</span>
-              <span>▸ AWS Cloud Practitioner</span>
-              <span>▸ Professional Scrum Master (PSM I)</span>
-              <span>▸ JLPT N4 — Japanese Language Proficiency</span>
-              <span>▸ FPT Software Internal Leadership Program</span>
+              <span>▸ Oracle Cloud Infrastructure 2023 Certified Foundations Associate (Sep 2023)</span>
+              <span>▸ Oracle Cloud Infrastructure 2023 AI Certified Foundations Associate (Sep 2023)</span>
+              <span>▸ Oracle Cloud Data Management 2023 Certified Foundations Associate (Sep 2023)</span>
+              <span>▸ Full Stack JavaScript Developer (Feb 2024)</span>
+              <span>▸ Backend Development with Node.js (Feb 2024)</span>
+              <span>▸ Intermediate JavaScript (Feb 2024)</span>
+              <span>▸ OutSystems Associate Web Developer (Jun 2020)</span>
+              <span>▸ Predix Certified Developer (Feb 2018)</span>
             </div>
           </section>
         </div>
