@@ -5,33 +5,40 @@ import LoadingSpinner from '@/shared/components/LoadingSpinner'
 import { useIntersection } from '@/shared/hooks/useIntersection'
 
 const DEFAULT_SKILLS = [
-  { id: '1', name: 'ReactJS', category: 'Frontend', level: 95 },
-  { id: '2', name: 'React Native', category: 'Frontend', level: 90 },
-  { id: '3', name: 'Angular', category: 'Frontend', level: 80 },
-  { id: '4', name: 'TypeScript', category: 'Frontend', level: 90 },
-  { id: '5', name: 'HTML/CSS', category: 'Frontend', level: 95 },
-  { id: '6', name: '.NET Core', category: 'Backend', level: 95 },
+  // AI & LLM — primary differentiator
+  { id: '1', name: 'Azure OpenAI', category: 'AI & LLM', level: 95 },
+  { id: '2', name: 'GitHub Copilot Agent Dev', category: 'AI & LLM', level: 93 },
+  { id: '3', name: 'Azure Document Intelligence', category: 'AI & LLM', level: 90 },
+  { id: '4', name: 'LangChain / RAG', category: 'AI & LLM', level: 85 },
+  { id: '5', name: 'Embeddings / Vector DB', category: 'AI & LLM', level: 82 },
+  { id: '6', name: 'ABBYY Fine Reader', category: 'AI & LLM', level: 85 },
+  // Backend
   { id: '7', name: 'C#', category: 'Backend', level: 95 },
-  { id: '8', name: 'Node.js', category: 'Backend', level: 80 },
-  { id: '9', name: 'SpringBoot', category: 'Backend', level: 70 },
-  { id: '10', name: 'MSSQL', category: 'Database', level: 85 },
-  { id: '11', name: 'PostgreSQL', category: 'Database', level: 80 },
-  { id: '12', name: 'MongoDB', category: 'Database', level: 75 },
-  { id: '13', name: 'MySQL', category: 'Database', level: 80 },
-  { id: '14', name: 'Azure', category: 'Cloud & DevOps', level: 85 },
-  { id: '15', name: 'AWS', category: 'Cloud & DevOps', level: 70 },
-  { id: '16', name: 'GCP', category: 'Cloud & DevOps', level: 65 },
-  { id: '17', name: 'Docker', category: 'Cloud & DevOps', level: 80 },
-  { id: '18', name: 'Redis', category: 'Tools', level: 80 },
-  { id: '19', name: 'RabbitMQ', category: 'Tools', level: 75 },
-  { id: '20', name: 'Elasticsearch', category: 'Tools', level: 70 },
-  { id: '21', name: 'Hangfire', category: 'Tools', level: 85 },
-  { id: '22', name: 'GitHub Copilot', category: 'AI & LLM', level: 90 },
-  { id: '23', name: 'Claude (Anthropic)', category: 'AI & LLM', level: 85 },
-  { id: '24', name: 'LLM APIs (GPT-4, Gemini)', category: 'AI & LLM', level: 80 },
-  { id: '25', name: 'RAG / Vector Search', category: 'AI & LLM', level: 75 },
-  { id: '26', name: 'ABBYY FlexiCapture', category: 'AI & LLM', level: 90 },
-  { id: '27', name: 'AI Prompt Engineering', category: 'AI & LLM', level: 80 },
+  { id: '8', name: '.NET Core / .NET 8', category: 'Backend', level: 95 },
+  { id: '9', name: 'Entity Framework', category: 'Backend', level: 88 },
+  { id: '10', name: 'Node.js', category: 'Backend', level: 75 },
+  { id: '11', name: 'SignalR / Azure Service Bus', category: 'Backend', level: 80 },
+  // Frontend
+  { id: '12', name: 'Angular', category: 'Frontend', level: 85 },
+  { id: '13', name: 'ReactJS', category: 'Frontend', level: 85 },
+  { id: '14', name: 'React Native', category: 'Frontend', level: 83 },
+  { id: '15', name: 'TypeScript', category: 'Frontend', level: 87 },
+  { id: '16', name: 'HTML / CSS', category: 'Frontend', level: 88 },
+  // Database
+  { id: '17', name: 'MSSQL', category: 'Database', level: 90 },
+  { id: '18', name: 'MySQL', category: 'Database', level: 82 },
+  { id: '19', name: 'MongoDB', category: 'Database', level: 80 },
+  { id: '20', name: 'Elasticsearch', category: 'Database', level: 78 },
+  // Cloud & DevOps
+  { id: '21', name: 'Azure', category: 'Cloud & DevOps', level: 88 },
+  { id: '22', name: 'AWS', category: 'Cloud & DevOps', level: 72 },
+  { id: '23', name: 'GCP', category: 'Cloud & DevOps', level: 68 },
+  { id: '24', name: 'Docker', category: 'Cloud & DevOps', level: 80 },
+  // Tools
+  { id: '25', name: 'Redis', category: 'Tools', level: 85 },
+  { id: '26', name: 'RabbitMQ', category: 'Tools', level: 80 },
+  { id: '27', name: 'Hangfire', category: 'Tools', level: 82 },
+  { id: '28', name: 'Datadog / Sentry', category: 'Tools', level: 72 },
 ]
 
 const categoryConfig: Record<string, { pill: string; bar: string; icon: string }> = {

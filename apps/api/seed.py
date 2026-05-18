@@ -40,9 +40,9 @@ async def seed_owner(db: AsyncSession):
         password_hash=hash_password(OWNER_PASSWORD),
         display_name="Võ Hoàng Ân",
         bio=(
-            "Full-Stack Developer & Tech Lead at FPT Software. "
-            "9+ years building scalable web and mobile applications. "
-            "Passionate about clean architecture, performance, and developer experience."
+            ".NET Developer & Technical Lead at FPT Software. "
+            "10+ years delivering enterprise software, specialized in AI/LLM solutions "
+            "and GitHub Copilot agent development for the SDLC."
         ),
         role="owner",
         status="active",
@@ -69,18 +69,18 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
     if not result.scalar_one_or_none():
         db.add(PortfolioProfile(
             user_id=user_id,
-            headline="Full-Stack Developer & Tech Lead",
-            tagline="9+ years building scalable web & mobile apps",
+            headline=".NET Developer & Technical Lead",
+            tagline="10+ years delivering enterprise software — AI/LLM solutions & GitHub Copilot agent development",
             about=(
-                "Experienced developer with 9 years of web development using .NET and C#, "
-                "and 5 years of mobile development using React Native. "
-                "Currently Sub Project Lead at FPT Software, leading teams delivering "
-                "AI-powered document intelligence, real estate management systems, "
-                "and blockchain loyalty platforms.\n\n"
-                "Strong expertise in system design, cross-functional collaboration, "
-                "and delivering production-quality software at scale."
+                "Results-driven Technical Lead and AI Engineer with 10+ years at FPT Software. "
+                "Specializes in leveraging AI and LLMs to optimize the SDLC — building custom GitHub Copilot "
+                "agents that automate code generation, code reviews, refactoring, and unit test creation.\n\n"
+                "Deep expertise in the .NET ecosystem (C#, .NET Core, .NET 8) combined with applied AI "
+                "engineering: Azure OpenAI, Azure Document Intelligence, LangChain, RAG, and vector databases. "
+                "Has led teams of up to 60 engineers across enterprise platforms in AI/document intelligence, "
+                "blockchain loyalty, real estate management, OCR processing, and DICOM medical imaging."
             ),
-            github_url="https://github.com/hoangan-dev",
+            github_url="https://github.com/hoangan615",
             open_to_work=False,
         ))
         print("  Created portfolio profile")
@@ -91,32 +91,40 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
     )
     if existing_skills.scalar() == 0:
         skills_data = [
-            # Frontend
-            ("ReactJS", "Frontend", 90, 0),
-            ("React Native", "Frontend", 88, 1),
-            ("Angular", "Frontend", 85, 2),
-            ("TypeScript", "Frontend", 87, 3),
-            ("HTML / CSS", "Frontend", 90, 4),
+            # AI & LLM — primary differentiator
+            ("Azure OpenAI", "AI & LLM", 95, 0),
+            ("GitHub Copilot Agent Dev", "AI & LLM", 93, 1),
+            ("Azure Document Intelligence", "AI & LLM", 90, 2),
+            ("LangChain / RAG", "AI & LLM", 85, 3),
+            ("Embeddings / Vector DB", "AI & LLM", 82, 4),
+            ("ABBYY Fine Reader", "AI & LLM", 85, 5),
             # Backend
-            (".NET Core", "Backend", 95, 10),
-            ("C#", "Backend", 95, 11),
-            ("Node.js", "Backend", 78, 12),
-            ("SpringBoot", "Backend", 72, 13),
+            ("C#", "Backend", 95, 10),
+            (".NET Core / .NET 8", "Backend", 95, 11),
+            ("Entity Framework", "Backend", 88, 12),
+            ("Node.js", "Backend", 75, 13),
+            ("SignalR / Azure Service Bus", "Backend", 80, 14),
+            # Frontend
+            ("Angular", "Frontend", 85, 20),
+            ("ReactJS", "Frontend", 85, 21),
+            ("React Native", "Frontend", 83, 22),
+            ("TypeScript", "Frontend", 87, 23),
+            ("HTML / CSS", "Frontend", 88, 24),
             # Database
-            ("MSSQL", "Database", 90, 20),
-            ("PostgreSQL", "Database", 85, 21),
-            ("MySQL", "Database", 85, 22),
-            ("MongoDB", "Database", 80, 23),
+            ("MSSQL", "Database", 90, 30),
+            ("MySQL", "Database", 82, 31),
+            ("MongoDB", "Database", 80, 32),
+            ("Elasticsearch", "Database", 78, 33),
             # Cloud & DevOps
-            ("Azure", "Cloud/DevOps", 85, 30),
-            ("AWS", "Cloud/DevOps", 75, 31),
-            ("GCP", "Cloud/DevOps", 70, 32),
-            ("Docker", "Cloud/DevOps", 82, 33),
+            ("Azure", "Cloud & DevOps", 88, 40),
+            ("AWS", "Cloud & DevOps", 72, 41),
+            ("GCP", "Cloud & DevOps", 68, 42),
+            ("Docker", "Cloud & DevOps", 80, 43),
             # Tools
-            ("Redis", "Tools", 85, 40),
-            ("RabbitMQ", "Tools", 80, 41),
-            ("Elasticsearch", "Tools", 78, 42),
-            ("Hangfire", "Tools", 82, 43),
+            ("Redis", "Tools", 85, 50),
+            ("RabbitMQ", "Tools", 80, 51),
+            ("Hangfire", "Tools", 82, 52),
+            ("Datadog / Sentry", "Tools", 72, 53),
         ]
         for name, category, proficiency, sort_order in skills_data:
             db.add(Skill(
@@ -136,23 +144,130 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
         experiences_data = [
             {
                 "company": "FPT Software",
-                "title": "Sub Project Lead / Team Lead",
+                "title": "Sub Project Lead / AI Engineer",
                 "location": "Ho Chi Minh City, Vietnam",
-                "start_date": "2015-11",
+                "start_date": "2024-12",
                 "end_date": None,
                 "description": (
-                    "Led multiple sub-teams across diverse domains:\n"
-                    "• CPE2024 - AI document intelligence platform (30 members)\n"
-                    "• KIZUNA - Real estate contract management system (28 members)\n"
-                    "• FCTAKC - Blockchain-based loyalty system (50 members)\n"
-                    "• CPE Phase 2/3 - OCR document processing system (20 members)\n"
-                    "• CT_CAD - Medical DICOM imaging system (40 members)\n\n"
-                    "Responsibilities: estimation, planning, tracking, code review, "
-                    "architecture design, and customer reporting across all projects."
+                    "Leading AI feature development for an enterprise document intelligence platform "
+                    "(CPE2024/CPE2025) serving a major Japanese financial institution. Spearheaded the "
+                    "initiative to integrate GitHub Copilot agents and Azure OpenAI into both the product "
+                    "and the engineering workflow across a 60-member team.\n\n"
+                    "Key achievements:\n"
+                    "• Built custom GitHub Copilot agents: code generation (−15–25% effort), "
+                    "code review & refactoring (−20–30% review time, −40% review bugs), "
+                    "and unit test generation (−40% UT effort)\n"
+                    "• Leveraged Azure OpenAI + Azure Document Intelligence → 99% data capture accuracy\n"
+                    "• Architected RAG-powered AI Chatbot for customer support\n"
+                    "• Led AI feature sub-team: requirements analysis, architecture, code reviews"
                 ),
-                "technologies": ".NET Core, C#, Angular, ReactJS, React Native, Azure, AWS, GCP, "
-                                "PostgreSQL, MSSQL, MongoDB, Redis, RabbitMQ, Elasticsearch, Hangfire",
+                "technologies": ".NET Core, .NET 8, Angular, Azure OpenAI, Azure Document Intelligence, "
+                                "GitHub Copilot, LangChain, RAG, OCR (ABBYY), SQLServer, MongoDB, Redis, "
+                                "RabbitMQ, Elasticsearch",
                 "sort_order": 0,
+            },
+            {
+                "company": "FPT Software",
+                "title": "Sub Leader",
+                "location": "Ho Chi Minh City, Vietnam",
+                "start_date": "2026-01",
+                "end_date": "2026-04",
+                "description": (
+                    "Concurrent assignment as Sub Leader on COPATIS26 — a Carton Production Management "
+                    "System for a Japanese manufacturing client within a 112-member project organisation. "
+                    "Handled feature delivery alongside the main CPE2024/2025 engagement."
+                ),
+                "technologies": ".NET Framework, VB.Net, SQLServer",
+                "sort_order": 1,
+            },
+            {
+                "company": "FPT Software",
+                "title": "Sub Project Lead",
+                "location": "Ho Chi Minh City, Vietnam",
+                "start_date": "2023-07",
+                "end_date": "2024-11",
+                "description": (
+                    "Led full-cycle development of an integrated real estate contract management and "
+                    "construction-progress monitoring platform (KIZUNA23/24) for a leading Japanese "
+                    "property developer. 28-member team across web and mobile channels.\n\n"
+                    "Key achievements:\n"
+                    "• Contract processing time: 7 days → 1 day (7× improvement via e-signature integration)\n"
+                    "• Eliminated 95% of paper-based approval processes\n"
+                    "• Delivered real-time construction monitoring module with geo-tagged evidence\n"
+                    "• Shared component libraries accelerated feature delivery by 30%"
+                ),
+                "technologies": "Java, SpringBoot, Angular, ReactJS, ReactNative, SQLServer, Redis, GCP",
+                "sort_order": 2,
+            },
+            {
+                "company": "FPT Software",
+                "title": "Sub Project Lead",
+                "location": "Ho Chi Minh City, Vietnam",
+                "start_date": "2020-04",
+                "end_date": "2023-07",
+                "description": (
+                    "Spearheaded architecture and delivery of a blockchain-based enterprise loyalty ecosystem "
+                    "(FCTAKC) for a Japanese corporate network. Led from pilot to full production — 50-member team.\n\n"
+                    "Key achievements:\n"
+                    "• Microservice architecture on Azure/AWS — transaction volume 3× over legacy system\n"
+                    "• Private blockchain ensuring immutable audit trails with sub-second API response\n"
+                    "• Built consumer web/mobile, merchant portal, and back-office suite on shared design system\n"
+                    "• 50-engineer organisation; 99.9% SLA with <4 hours MTTR"
+                ),
+                "technologies": ".NET Core, ABP, Angular, ReactJS, ReactNative, Blockchain, "
+                                "SQLServer, MySQL, PostgreSQL, MongoDB, RabbitMQ, Redis, Azure, AWS",
+                "sort_order": 3,
+            },
+            {
+                "company": "FPT Software",
+                "title": "Core Member",
+                "location": "Ho Chi Minh City, Vietnam",
+                "start_date": "2018-02",
+                "end_date": "2020-04",
+                "description": (
+                    "Core engineer on a high-throughput OCR document processing system (CPE Phase 2/3) "
+                    "integrated with ABBYY FineReader Engine — 20-member team.\n\n"
+                    "Key achievements:\n"
+                    "• Automated OCR pipeline processing tens of thousands of pages/day\n"
+                    "• Throughput improved 40%, character error rate reduced below 2%\n"
+                    "• Angular operator interfaces reduced review time per document by 35%\n"
+                    "• Automated regression suite covering 500+ document templates"
+                ),
+                "technologies": ".NET Core, Angular, SQLServer, MongoDB, Elasticsearch, "
+                                "Redis, RabbitMQ, Hangfire, Azure, ABBYY OCR FineReader",
+                "sort_order": 4,
+            },
+            {
+                "company": "FPT Software",
+                "title": "Project Manager",
+                "location": "Ho Chi Minh City, Vietnam",
+                "start_date": "2019-02",
+                "end_date": "2019-04",
+                "description": (
+                    "Managed delivery of a virtual printer driver project (VPD) targeting macOS and Windows, "
+                    "upgrading a legacy codebase to use modern platform APIs. 5-member team, concurrent with "
+                    "CPE Phase 2/3. Delivered with a perfect 100 CSS (Customer Satisfaction Score)."
+                ),
+                "technologies": "C, C++, QT Creator, macOS, Windows",
+                "sort_order": 5,
+            },
+            {
+                "company": "FPT Software",
+                "title": "Team Lead / Member",
+                "location": "Ho Chi Minh City, Vietnam",
+                "start_date": "2015-11",
+                "end_date": "2017-12",
+                "description": (
+                    "Led delivery of a DICOM-compliant medical imaging platform (CT_CAD series) for CT/MRI "
+                    "diagnostics, serving hospitals and radiology centres in the Japanese healthcare market. "
+                    "40-member team.\n\n"
+                    "Key achievements:\n"
+                    "• DICOM-standards-compliant system (CT, MRI, X-Ray) — zero critical defects in clinical validation\n"
+                    "• Volume rendering algorithms doubled CT scan resolution vs prior release\n"
+                    "• PACS integration layer reduced image retrieval time from minutes to seconds"
+                ),
+                "technologies": "C#, .NET Framework, WPF, WCF, C++, SQLServer, Git, SVN",
+                "sort_order": 6,
             },
             {
                 "company": "Can Tho University",
@@ -162,11 +277,10 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "end_date": "2015-06",
                 "description": (
                     "Bachelor of Engineering in Information Technology. "
-                    "Graduated with Excellent distinction. "
-                    "Thesis: Real-time data processing system using .NET and SQL Server."
+                    "Graduated with Excellent distinction."
                 ),
                 "technologies": "C#, .NET, SQL Server, Java",
-                "sort_order": 1,
+                "sort_order": 7,
             },
         ]
         for exp in experiences_data:
@@ -180,13 +294,16 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
     if existing_proj.scalar() == 0:
         projects_data = [
             {
-                "title": "CPE2024 — AI Document Intelligence",
+                "title": "CPE2024 — AI Document Intelligence Platform",
                 "description": (
-                    "AI-powered platform for data capture, document scanning, and intelligent "
-                    "document processing. Sub Project Lead for AI feature team (30 members total). "
-                    "Used LLM and OCR to dramatically improve data extraction accuracy."
+                    "Enterprise AI document intelligence platform built with Azure OpenAI and Azure Document "
+                    "Intelligence, achieving 99% data capture accuracy. Also engineered custom GitHub Copilot "
+                    "agents that reduced implementation effort by 15–25% and review time by 20–30% across the "
+                    "60-member team. RAG-powered AI Chatbot significantly reduced customer support tickets."
                 ),
-                "tech_stack": ".NET Core, Angular, Azure, SQLServer, MongoDB, Redis, RabbitMQ, Elasticsearch, ABBYY Fine Reader, LLM",
+                "tech_stack": ".NET Core, .NET 8, Angular, Azure OpenAI, Azure Document Intelligence, "
+                              "GitHub Copilot, LangChain, RAG, SQLServer, MongoDB, Redis, RabbitMQ, "
+                              "Elasticsearch, ABBYY Fine Reader Engine",
                 "featured": True,
                 "sort_order": 0,
             },

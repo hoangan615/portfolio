@@ -4,9 +4,9 @@ import { portfolioApi } from '@/shared/api/portfolio'
 
 const DEFAULT_PROFILE = {
   name: 'Võ Hoàng Ân',
-  title: 'Full-Stack Developer & Tech Lead',
+  title: '.NET Developer & Technical Lead',
   company: 'FPT Software',
-  tagline: '10+ years delivering enterprise-grade web & mobile applications',
+  tagline: '10+ years delivering enterprise software — AI/LLM solutions & GitHub Copilot agent development',
   github: 'https://github.com/hoangan615',
   linkedin: 'https://www.linkedin.com/in/an-vo-012359159/',
   tiktok: 'https://www.tiktok.com/@tech.takeaway',
@@ -14,19 +14,19 @@ const DEFAULT_PROFILE = {
 
 const TECH_STACK = [
   { label: '.NET/C#', cls: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800' },
-  { label: 'React', cls: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800' },
-  { label: 'React Native', cls: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800' },
-  { label: 'Azure', cls: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
-  { label: 'AWS', cls: 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800' },
-  { label: 'GCP', cls: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800' },
-  { label: 'Docker', cls: 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800' },
+  { label: 'Azure OpenAI', cls: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
+  { label: 'GitHub Copilot', cls: 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800' },
+  { label: 'LangChain', cls: 'bg-green-500/10 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' },
+  { label: 'ReactJS', cls: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800' },
+  { label: 'Angular', cls: 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800' },
+  { label: 'Azure', cls: 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800' },
 ]
 
 const STATS = [
   { value: '10+', label: 'Years' },
   { value: '20+', label: 'Projects' },
-  { value: '50+', label: 'Team size' },
-  { value: '6+', label: 'Certs' },
+  { value: '60+', label: 'Team size' },
+  { value: '8', label: 'Certs' },
 ]
 
 function TikTokIcon({ className }: { className?: string }) {
@@ -109,11 +109,11 @@ export default function Hero() {
         {/* Tagline */}
         <p className="mb-10 mx-auto max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
           {DEFAULT_PROFILE.tagline}. Specialized in{' '}
-          <span className="text-foreground font-medium">.NET/C#</span>,{' '}
-          <span className="text-foreground font-medium">React</span>{' '}
+          <span className="text-foreground font-medium">Azure OpenAI</span>,{' '}
+          <span className="text-foreground font-medium">.NET/C#</span>{' '}
           &amp;{' '}
-          <span className="text-foreground font-medium">React Native</span>{' '}
-          — having led teams of 20–50 engineers on high-impact enterprise platforms.
+          <span className="text-foreground font-medium">GitHub Copilot Agents</span>{' '}
+          — having led teams of up to 60 engineers on mission-critical enterprise platforms.
         </p>
 
         {/* CTA buttons */}
