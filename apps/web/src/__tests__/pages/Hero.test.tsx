@@ -36,7 +36,7 @@ describe('Hero — default profile (Võ Hoàng Ân)', () => {
 
   it('renders the current role', async () => {
     renderHero()
-    const role = await screen.findByText(/Full-Stack Developer/i)
+    const role = await screen.findByText(/\.NET Developer & Technical Lead/i)
     expect(role).toBeInTheDocument()
   })
 
