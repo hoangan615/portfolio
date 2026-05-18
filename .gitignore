@@ -182,6 +182,7 @@ Thumbs.db
 coverage.xml
 *.cover
 junit.xml
+test-results.xml
 htmlcov/
 *.db
 
