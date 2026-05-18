@@ -145,5 +145,5 @@ jobs:
         with:
           working-directory: apps/web
           name: Frontend Coverage
-          json-summary-path: apps/web/coverage/coverage-summary.json
-          json-final-path: apps/web/coverage/coverage-final.json
+          json-summary-path: coverage/coverage-summary.json
+          json-final-path: coverage/coverage-final.json
