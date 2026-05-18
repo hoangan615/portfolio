@@ -176,7 +176,7 @@ services:
     container_name: portfolio_worker
     restart: unless-stopped
     <<: *api-env
-    command: celery -A worker worker --loglevel=debug --concurrency=2 -Q video,default --autoreload
+    command: celery -A worker worker --loglevel=debug --concurrency=2 -Q video,default
     volumes:
       - ./workers/video-processor:/app
       - worker_tmp:/tmp/video-work
