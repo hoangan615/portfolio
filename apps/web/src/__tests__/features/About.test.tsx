@@ -40,7 +40,7 @@ describe('About', () => {
   it('renders default bio paragraphs', () => {
     renderAbout()
     // DEFAULT_BIO is always rendered - check for ASCII content from paragraph
-    expect(screen.getByText(/Full-Stack Software Engineer/i)).toBeInTheDocument()
+    expect(screen.getByText(/Technical Lead and AI Engineer/i)).toBeInTheDocument()
   })
 
   it('renders language proficiency section', () => {

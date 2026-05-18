@@ -11,6 +11,7 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects.postgresql import ENUM as PGENUM
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 revision: str = "001"
@@ -25,46 +26,15 @@ def upgrade() -> None:
     op.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
 
     # ── Enums ─────────────────────────────────────────────────────────────────
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE user_role AS ENUM ('owner','admin','moderator','member','restricted','banned','guest');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE user_status AS ENUM ('active','pending','suspended','deleted');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE post_type AS ENUM ('article','short','gallery','til');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE post_status AS ENUM ('draft','pending_review','published','rejected','archived');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE video_status AS ENUM ('uploading','processing','ready','failed');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE video_visibility AS ENUM ('public','unlisted','private');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE content_type AS ENUM ('post','video','comment');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE experience_type AS ENUM ('work','education');
-        EXCEPTION WHEN duplicate_object THEN NULL; END $$
-    """)
+    bind = op.get_bind()
+    PGENUM("owner", "admin", "moderator", "member", "restricted", "banned", "guest", name="user_role").create(bind, checkfirst=True)
+    PGENUM("active", "pending", "suspended", "deleted", name="user_status").create(bind, checkfirst=True)
+    PGENUM("article", "short", "gallery", "til", name="post_type").create(bind, checkfirst=True)
+    PGENUM("draft", "pending_review", "published", "rejected", "archived", name="post_status").create(bind, checkfirst=True)
+    PGENUM("uploading", "processing", "ready", "failed", name="video_status").create(bind, checkfirst=True)
+    PGENUM("public", "unlisted", "private", name="video_visibility").create(bind, checkfirst=True)
+    PGENUM("post", "video", "comment", name="content_type").create(bind, checkfirst=True)
+    PGENUM("work", "education", name="experience_type").create(bind, checkfirst=True)
 
     # ── users ─────────────────────────────────────────────────────────────────
     op.create_table(
@@ -79,8 +49,8 @@ def upgrade() -> None:
         sa.Column("bio", sa.Text, nullable=True),
         sa.Column("website_url", sa.String(500), nullable=True),
         sa.Column("location", sa.String(100), nullable=True),
-        sa.Column("role", sa.Enum("owner","admin","moderator","member","restricted","banned","guest", name="user_role"), nullable=False, server_default="member"),
-        sa.Column("status", sa.Enum("active","pending","suspended","deleted", name="user_status"), nullable=False, server_default="pending"),
+        sa.Column("role", PGENUM("owner", "admin", "moderator", "member", "restricted", "banned", "guest", name="user_role", create_type=False), nullable=False, server_default="member"),
+        sa.Column("status", PGENUM("active", "pending", "suspended", "deleted", name="user_status", create_type=False), nullable=False, server_default="pending"),
         sa.Column("email_verified", sa.Boolean, nullable=False, server_default="false"),
         sa.Column("follower_count", sa.Integer, nullable=False, server_default="0"),
         sa.Column("following_count", sa.Integer, nullable=False, server_default="0"),
@@ -199,7 +169,7 @@ def upgrade() -> None:
         "experiences",
         sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
         sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("type", sa.Enum("work","education", name="experience_type"), nullable=False, server_default="work"),
+        sa.Column("type", PGENUM("work", "education", name="experience_type", create_type=False), nullable=False, server_default="work"),
         sa.Column("company", sa.String(255), nullable=False),
         sa.Column("title", sa.String(255), nullable=False),
         sa.Column("location", sa.String(255), nullable=True),
@@ -229,13 +199,13 @@ def upgrade() -> None:
         "posts",
         sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
         sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("type", sa.Enum("article","short","gallery","til", name="post_type"), nullable=False, server_default="article"),
+        sa.Column("type", PGENUM("article", "short", "gallery", "til", name="post_type", create_type=False), nullable=False, server_default="article"),
         sa.Column("title", sa.String(500), nullable=True),
         sa.Column("slug", sa.String(500), nullable=False, unique=True),
         sa.Column("content", sa.Text, nullable=True),
         sa.Column("excerpt", sa.Text, nullable=True),
         sa.Column("cover_image_url", sa.String(500), nullable=True),
-        sa.Column("status", sa.Enum("draft","pending_review","published","rejected","archived", name="post_status"), nullable=False, server_default="draft"),
+        sa.Column("status", PGENUM("draft", "pending_review", "published", "rejected", "archived", name="post_status", create_type=False), nullable=False, server_default="draft"),
         sa.Column("review_note", sa.Text, nullable=True),
         sa.Column("view_count", sa.Integer, nullable=False, server_default="0"),
         sa.Column("published_at", sa.DateTime(timezone=True), nullable=True),
@@ -255,8 +225,8 @@ def upgrade() -> None:
         sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("title", sa.String(500), nullable=False),
         sa.Column("description", sa.Text, nullable=True),
-        sa.Column("status", sa.Enum("uploading","processing","ready","failed", name="video_status"), nullable=False, server_default="uploading"),
-        sa.Column("visibility", sa.Enum("public","unlisted","private", name="video_visibility"), nullable=False, server_default="public"),
+        sa.Column("status", PGENUM("uploading", "processing", "ready", "failed", name="video_status", create_type=False), nullable=False, server_default="uploading"),
+        sa.Column("visibility", PGENUM("public", "unlisted", "private", name="video_visibility", create_type=False), nullable=False, server_default="public"),
         sa.Column("raw_s3_key", sa.String(500), nullable=True),
         sa.Column("hls_manifest_url", sa.String(500), nullable=True),
         sa.Column("thumbnail_url", sa.String(500), nullable=True),
