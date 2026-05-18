@@ -150,7 +150,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "end_date": None,
                 "description": (
                     "Leading AI feature development for an enterprise document intelligence platform "
-                    "(CPE2024/CPE2025) serving a major Japanese financial institution. Spearheaded the "
+                    "serving a major Japanese financial institution. Spearheaded the "
                     "initiative to integrate GitHub Copilot agents and Azure OpenAI into both the product "
                     "and the engineering workflow across a 60-member team.\n\n"
                     "Key achievements:\n"
@@ -173,9 +173,8 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "start_date": "2026-01",
                 "end_date": "2026-04",
                 "description": (
-                    "Concurrent assignment as Sub Leader on COPATIS26 — a Carton Production Management "
-                    "System for a Japanese manufacturing client within a 112-member project organisation. "
-                    "Handled feature delivery alongside the main CPE2024/2025 engagement."
+                    "Concurrent assignment as Sub Leader on a Carton Production Management "
+                    "System for a Japanese manufacturing client within a 112-member project organisation."
                 ),
                 "technologies": ".NET Framework, VB.Net, SQLServer",
                 "sort_order": 1,
@@ -188,7 +187,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "end_date": "2024-11",
                 "description": (
                     "Led full-cycle development of an integrated real estate contract management and "
-                    "construction-progress monitoring platform (KIZUNA23/24) for a leading Japanese "
+                    "construction-progress monitoring platform for a leading Japanese "
                     "property developer. 28-member team across web and mobile channels.\n\n"
                     "Key achievements:\n"
                     "• Contract processing time: 7 days → 1 day (7× improvement via e-signature integration)\n"
@@ -207,7 +206,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "end_date": "2023-07",
                 "description": (
                     "Spearheaded architecture and delivery of a blockchain-based enterprise loyalty ecosystem "
-                    "(FCTAKC) for a Japanese corporate network. Led from pilot to full production — 50-member team.\n\n"
+                    "for a Japanese corporate network. Led from pilot to full production — 50-member team.\n\n"
                     "Key achievements:\n"
                     "• Microservice architecture on Azure/AWS — transaction volume 3× over legacy system\n"
                     "• Private blockchain ensuring immutable audit trails with sub-second API response\n"
@@ -225,7 +224,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "start_date": "2018-02",
                 "end_date": "2020-04",
                 "description": (
-                    "Core engineer on a high-throughput OCR document processing system (CPE Phase 2/3) "
+                    "Core engineer on a high-throughput OCR document processing system "
                     "integrated with ABBYY FineReader Engine — 20-member team.\n\n"
                     "Key achievements:\n"
                     "• Automated OCR pipeline processing tens of thousands of pages/day\n"
@@ -244,9 +243,9 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "start_date": "2019-02",
                 "end_date": "2019-04",
                 "description": (
-                    "Managed delivery of a virtual printer driver project (VPD) targeting macOS and Windows, "
-                    "upgrading a legacy codebase to use modern platform APIs. 5-member team, concurrent with "
-                    "CPE Phase 2/3. Delivered with a perfect 100 CSS (Customer Satisfaction Score)."
+                    "Managed delivery of a virtual printer driver project targeting macOS and Windows, "
+                    "upgrading a legacy codebase to use modern platform APIs. 5-member team. "
+                    "Delivered with a perfect 100 CSS (Customer Satisfaction Score)."
                 ),
                 "technologies": "C, C++, QT Creator, macOS, Windows",
                 "sort_order": 5,
@@ -258,7 +257,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "start_date": "2015-11",
                 "end_date": "2017-12",
                 "description": (
-                    "Led delivery of a DICOM-compliant medical imaging platform (CT_CAD series) for CT/MRI "
+                    "Led delivery of a DICOM-compliant medical imaging platform for CT/MRI "
                     "diagnostics, serving hospitals and radiology centres in the Japanese healthcare market. "
                     "40-member team.\n\n"
                     "Key achievements:\n"
@@ -294,7 +293,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
     if existing_proj.scalar() == 0:
         projects_data = [
             {
-                "title": "CPE2024 — AI Document Intelligence Platform",
+                "title": "AI Document Intelligence Platform",
                 "description": (
                     "Enterprise AI document intelligence platform built with Azure OpenAI and Azure Document "
                     "Intelligence, achieving 99% data capture accuracy. Also engineered custom GitHub Copilot "
@@ -308,7 +307,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "sort_order": 0,
             },
             {
-                "title": "FCTAKC — Blockchain Loyalty Platform",
+                "title": "Enterprise Blockchain Loyalty Platform",
                 "description": (
                     "Enterprise blockchain-based loyalty system for medium and large companies. "
                     "Led the 6-member mobile team, designed micro-frontend architecture, "
@@ -319,7 +318,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "sort_order": 1,
             },
             {
-                "title": "KIZUNA — Real Estate Management System",
+                "title": "Real Estate Contract & Construction Platform",
                 "description": (
                     "Contract management system and construction project monitoring app for real "
                     "estate business. Sub Project Lead (28 members). Built both web application "
@@ -330,7 +329,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "sort_order": 2,
             },
             {
-                "title": "CPE — OCR Document Processing System",
+                "title": "OCR Document Processing System",
                 "description": (
                     "OCR system using ABBYY FineReader to extract and process data from generic "
                     "business documents (POs, registration forms, event docs). Supports email, "
@@ -342,7 +341,7 @@ async def seed_portfolio(db: AsyncSession, user_id) -> None:
                 "sort_order": 3,
             },
             {
-                "title": "CT_CAD — DICOM Medical Imaging System",
+                "title": "DICOM Medical Imaging System",
                 "description": (
                     "System to view, analyze, and transfer DICOM medical images. "
                     "Handles filming progress display, storage, DVD burning, and automatic "

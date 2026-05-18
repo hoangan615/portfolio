@@ -38,7 +38,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2024-12-01',
     endDate: null,
     isCurrent: true,
-    description: 'Leading AI feature development for an enterprise document intelligence platform (CPE2024/CPE2025) serving a major Japanese financial institution. Spearheaded the initiative to integrate GitHub Copilot agents and Azure OpenAI into both the product and the engineering workflow across a 60-member team.',
+    description: 'Leading AI feature development for an enterprise document intelligence platform serving a major Japanese financial institution. Spearheaded the initiative to integrate GitHub Copilot agents and Azure OpenAI into both the product and the engineering workflow across a 60-member team.',
     highlights: [
       'Built and deployed custom GitHub Copilot agents in VS Code: a code generation agent for .NET & ReactJS (−15–25% implementation effort), an automated code review & refactoring agent (−20–30% review time, −40% review-related bugs), and a unit test (xUnit) generation agent (−40% UT creation effort)',
       'Leveraged Azure OpenAI (LLM) and Azure Document Intelligence to enhance the core data capture engine, increasing overall data extraction accuracy to 99% on production documents',
@@ -54,7 +54,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2026-01-01',
     endDate: '2026-04-30',
     isCurrent: false,
-    description: 'Concurrent assignment as Sub Leader on COPATIS26 — a Carton Production Management System for a Japanese manufacturing client (112-member project). Handled feature delivery alongside the main CPE2024/2025 engagement.',
+    description: 'Concurrent assignment as Sub Leader on a Carton Production Management System for a Japanese manufacturing client (112-member project).',
     highlights: [
       'Delivered feature development and modifications aligned to detailed design specifications within a 112-member project organisation',
       'Reviewed code against detailed design documentation, ensuring correctness and adherence to functional requirements',
@@ -69,7 +69,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2023-07-01',
     endDate: '2024-11-30',
     isCurrent: false,
-    description: 'Led full-cycle development of an integrated real estate contract management and construction-progress monitoring platform (KIZUNA) for a leading Japanese property developer. Oversaw planning, architecture, and delivery across web and mobile channels for a 28-member team.',
+    description: 'Led full-cycle development of an integrated real estate contract management and construction-progress monitoring platform for a leading Japanese property developer. Oversaw planning, architecture, and delivery across web and mobile channels for a 28-member team.',
     highlights: [
       'Redesigned the end-to-end contract lifecycle workflow with integrated e-signature, compressing contract processing time from 7 days to 1 day — a measurable 7× improvement in client operational KPIs',
       'Eliminated 95% of paper-based approval processes by digitising document workflows, automated compliance reporting, and role-based approval chains',
@@ -85,7 +85,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2020-04-01',
     endDate: '2023-07-31',
     isCurrent: false,
-    description: 'Spearheaded architecture and delivery of a blockchain-based enterprise loyalty ecosystem (FCTAKC), unifying reward programmes across a network of Japanese corporate partners on a distributed ledger. Led a 50-member organisation from pilot to full production scale.',
+    description: 'Spearheaded architecture and delivery of a blockchain-based enterprise loyalty ecosystem, unifying reward programmes across a network of Japanese corporate partners on a distributed ledger. Led a 50-member organisation from pilot to full production scale.',
     highlights: [
       'Designed a microservice architecture on Azure and AWS supporting near-real-time point issuance, redemption, and settlement across 50+ partner organisations — growing transaction volume 3× over the legacy system within the first year',
       'Engineered an on-chain and off-chain data strategy using a private blockchain, ensuring immutable audit trails with sub-second response times for consumer-facing APIs',
@@ -101,7 +101,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2018-02-01',
     endDate: '2020-04-30',
     isCurrent: false,
-    description: 'Contributed as a core engineer on a high-throughput OCR document processing system (CPE Phase 2/3) integrated with ABBYY FineReader Engine, serving enterprise clients requiring large-scale automated document digitisation and quality control.',
+    description: 'Contributed as a core engineer on a high-throughput OCR document processing system integrated with ABBYY FineReader Engine, serving enterprise clients requiring large-scale automated document digitisation and quality control.',
     highlights: [
       'Engineered a fully automated OCR ingestion pipeline processing tens of thousands of pages per day with multi-format support (PDF, TIFF, JPEG) and automatic pre-processing — deskewing, noise reduction, contrast normalisation',
       'Optimised the recognition pipeline via parallel processing and post-processing correction algorithms — improving throughput by 40% and reducing character error rates below 2% on production datasets',
@@ -117,7 +117,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2019-02-01',
     endDate: '2019-04-30',
     isCurrent: false,
-    description: 'Managed delivery of a virtual printer driver project (VPD) targeting macOS and Windows — upgrading a legacy codebase to use modern platform APIs for a Japanese hardware client. 5-member team, concurrent with CPE Phase 2/3.',
+    description: 'Managed delivery of a virtual printer driver project targeting macOS and Windows — upgrading a legacy codebase to use modern platform APIs for a Japanese hardware client. 5-member team.',
     highlights: [
       'Led estimation, planning, and progress tracking for a fixed-scope 3-month engagement',
       'Resolved a critical testing blocker related to macOS device provisioning, unblocking the QA phase and enabling on-time delivery',
@@ -132,7 +132,7 @@ const DEFAULT_EXPERIENCES: ExperienceType[] = [
     startDate: '2015-11-01',
     endDate: '2017-12-31',
     isCurrent: false,
-    description: 'Led delivery of a DICOM-compliant medical imaging platform (CT_CAD series) for CT and MRI diagnostics, serving hospitals and radiology centres in the Japanese healthcare market. Responsible for regulatory alignment, team leadership, and direct collaboration with medical professionals.',
+    description: 'Led delivery of a DICOM-compliant medical imaging platform for CT and MRI diagnostics, serving hospitals and radiology centres in the Japanese healthcare market. Responsible for regulatory alignment, team leadership, and direct collaboration with medical professionals.',
     highlights: [
       'Architected a DICOM-standards-compliant image processing and visualisation system (CT, MRI, X-Ray) — met Japan\'s medical device software regulatory requirements with zero critical defects in clinical validation',
       'Implemented volume rendering and multi-planar reconstruction algorithms that doubled CT scan resolution versus the prior release, meaningfully improving diagnostic clarity for radiologists',
