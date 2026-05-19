@@ -21,6 +21,9 @@ export default defineConfig({
         // Use the Docker service name so the proxy reaches the api container.
         target: process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:8000',
         changeOrigin: true,
+        // Rewrite Set-Cookie domain so the browser stores cookies for localhost
+        // (the browser's origin) instead of the upstream service hostname.
+        cookieDomainRewrite: { '*': '' },
       },
       '/ws': {
         target: process.env.VITE_WS_PROXY_TARGET ?? 'http://localhost:8000',

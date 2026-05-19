@@ -12,14 +12,26 @@ export function useAuth() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  // Silently restore session on app load
-  const { isLoading: isLoadingMe } = useQuery({
+  // Silently restore session on app load:
+  // The access token lives in memory and is lost on F5. When isAuthenticated is
+  // true but accessToken is null, we fire /users/me which triggers the Axios
+  // interceptor to call /auth/refresh (using the HttpOnly cookie) and retry.
+  // On success the interceptor calls setAccessToken(); on failure it logs out.
+  const { isLoading: isLoadingMe, data: meData } = useQuery({
     queryKey: QUERY_KEYS.me,
     queryFn: authApi.me,
     enabled: isAuthenticated && !accessToken,
     retry: false,
     staleTime: Infinity,
   })
+
+  // Sync freshly fetched user data back into the auth store (keeps it up-to-date
+  // after session restore without requiring a separate effect dependency).
+  useEffect(() => {
+    if (meData) {
+      useAuthStore.getState().setUser(meData)
+    }
+  }, [meData])
 
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
@@ -36,11 +48,12 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: (credentials: RegisterCredentials) => authApi.register(credentials),
-    onSuccess: (data) => {
-      login(data.accessToken, data.user)
-      queryClient.setQueryData(QUERY_KEYS.me, data.user)
-      toast.success('Account created!', 'Welcome to the community.')
-      navigate('/')
+    onSuccess: () => {
+      // Register only sends an email verification link — no tokens are issued yet.
+      // Do NOT call login() here; it would set isAuthenticated=true with no token/cookie,
+      // which breaks session restore on F5 and causes an immediate redirect loop.
+      toast.success('Account created!', 'Check your email to verify your account, then log in.')
+      navigate('/login')
     },
     onError: () => {
       toast.error('Registration failed', 'Please check your details and try again.')

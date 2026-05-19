@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Send } from 'lucide-react'
 import { postsApi } from '@/shared/api/posts'
+import { QUERY_KEYS } from '@/lib/constants'
 import { toast } from '@/shared/stores/notificationStore'
 import Button from '@/shared/components/Button'
 import LoadingSpinner from '@/shared/components/LoadingSpinner'
@@ -18,6 +19,7 @@ const POST_TYPES = [
 export default function CreateEditPostPage() {
   const { slug } = useParams<{ slug?: string }>()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const isEditing = Boolean(slug)
 
   const [title, setTitle] = useState('')
@@ -47,6 +49,12 @@ export default function CreateEditPostPage() {
     }
   }, [existingPost, initialized])
 
+  const invalidatePosts = () => {
+    // Bust the dashboard list and the global feed so changes are visible immediately
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts })
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.feed })
+  }
+
   const createMutation = useMutation({
     mutationFn: () =>
       postsApi.create({
@@ -56,6 +64,7 @@ export default function CreateEditPostPage() {
         excerpt: excerpt || undefined,
       }),
     onSuccess: () => {
+      invalidatePosts()
       toast.success('Post created', 'Your post has been saved as a draft.')
       navigate('/dashboard/posts')
     },
@@ -73,6 +82,9 @@ export default function CreateEditPostPage() {
         excerpt: excerpt || undefined,
       }),
     onSuccess: () => {
+      invalidatePosts()
+      // Also invalidate the individual post so the edit form reloads fresh data
+      if (slug) queryClient.invalidateQueries({ queryKey: QUERY_KEYS.post(slug) })
       toast.success('Post updated', 'Your changes have been saved.')
       navigate('/dashboard/posts')
     },
@@ -84,6 +96,7 @@ export default function CreateEditPostPage() {
   const submitMutation = useMutation({
     mutationFn: () => postsApi.submit(postId!),
     onSuccess: () => {
+      invalidatePosts()
       toast.success('Post submitted', 'Your post is now pending review.')
       navigate('/dashboard/posts')
     },
