@@ -230,6 +230,9 @@ services:
       VITE_API_URL: ""
       VITE_WS_URL: /ws
       VITE_APP_NAME: "Portfolio & Tech Takeaway"
+      # Vite dev-server proxy targets — use Docker service names inside the network
+      VITE_API_PROXY_TARGET: "http://api:8000"
+      VITE_WS_PROXY_TARGET: "http://api:8000"
     volumes:
       - ./apps/web:/app
       - /app/node_modules

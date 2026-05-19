@@ -17,8 +17,15 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // Inside Docker, "localhost" resolves to the web container itself.
+        // Use the Docker service name so the proxy reaches the api container.
+        target: process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:8000',
         changeOrigin: true,
+      },
+      '/ws': {
+        target: process.env.VITE_WS_PROXY_TARGET ?? 'http://localhost:8000',
+        changeOrigin: true,
+        ws: true,
       },
     },
   },
