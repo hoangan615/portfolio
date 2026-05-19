@@ -129,6 +129,11 @@ export const postsApi = {
     return data
   },
 
+  publish: async (id: string): Promise<Post> => {
+    const { data } = await apiClient.post<Post>(`/posts/${id}/publish`)
+    return data
+  },
+
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/posts/${id}`)
   },
