@@ -24,6 +24,7 @@ import modules.notifications.models  # noqa: F401
 import modules.moderation.models  # noqa: F401
 import modules.analytics.models  # noqa: F401
 
+from modules.admin.router import router as admin_router
 from modules.analytics.router import router as analytics_router
 from modules.auth.router import router as auth_router
 from modules.comments.router import router as comments_router
@@ -83,6 +84,7 @@ def create_application() -> FastAPI:
     app.include_router(search_router, prefix=prefix)
     app.include_router(notifications_router, prefix=prefix)
     app.include_router(moderation_router, prefix=prefix)
+    app.include_router(admin_router, prefix=prefix)
     app.include_router(analytics_router, prefix=prefix)
 
     # ── Health check ──────────────────────────────────────────────────────────

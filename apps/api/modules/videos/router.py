@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 
 from modules.videos import schemas, service
 from shared.dependencies import CurrentUser, DBDep, require_min_role
@@ -14,8 +14,12 @@ MemberRequired = require_min_role("member")
 
 
 @router.get("", response_model=PagedResponse[schemas.VideoOut])
-async def list_videos(db: DBDep, params: PageParams = Depends()):
-    videos, total = await service.list_videos(db, params, visibility="public")
+async def list_videos(
+    db: DBDep,
+    params: PageParams = Depends(),
+    user_id: UUID | None = Query(None),
+):
+    videos, total = await service.list_videos(db, params, visibility="public", user_id=user_id)
     return PagedResponse.create(videos, total, params)  # pragma: no cover
 
 

@@ -3,6 +3,7 @@ import { buildQueryString } from '@/lib/utils'
 import type { UserProfile } from './auth'
 import type { PagedResponse } from './posts'
 import type { Post } from './posts'
+import type { Video } from './videos'
 
 export interface UpdateProfilePayload {
   displayName?: string
@@ -65,6 +66,19 @@ export const usersApi = {
     if (payload.websiteUrl !== undefined) body.website_url = payload.websiteUrl
     if (payload.location !== undefined) body.location = payload.location
     const { data } = await apiClient.patch<UserProfile>('/users/me', body)
+    return data
+  },
+
+  getUserVideos: async (
+    userId: string,
+    params?: { page?: number; pageSize?: number }
+  ): Promise<PagedResponse<Video>> => {
+    const qs = buildQueryString({
+      page: params?.page ?? 1,
+      page_size: params?.pageSize ?? 12,
+      user_id: userId,
+    })
+    const { data } = await apiClient.get<PagedResponse<Video>>(`/videos${qs}`)
     return data
   },
 
