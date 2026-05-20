@@ -270,10 +270,15 @@ export default function CommentSection({ contentType, contentId, className }: Co
     queryFn: () => commentsApi.getComments(contentType, contentId),
   })
 
-  // Backend returns flat list; group by parentId
+  // Backend returns flat list; group by parentId, sort newest first
   const allComments = data?.items ?? []
-  const topLevel = allComments.filter((c) => !c.parentId)
-  const getReplies = (parentId: string) => allComments.filter((c) => c.parentId === parentId)
+  const topLevel = allComments
+    .filter((c) => !c.parentId)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const getReplies = (parentId: string) =>
+    allComments
+      .filter((c) => c.parentId === parentId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   return (
     <section className={cn('flex flex-col gap-4', className)}>

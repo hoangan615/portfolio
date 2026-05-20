@@ -7,6 +7,7 @@ import { feedApi, type FeedItem } from '@/shared/api/feed'
 import { useAuthStore } from '@/shared/stores/authStore'
 import { QUERY_KEYS } from '@/lib/constants'
 import InfiniteList from '@/shared/components/InfiniteList'
+import FeedCard from './FeedCard'
 import type { PagedResponse } from '@/shared/api/posts'
 
 type FeedTab = 'global' | 'following' | 'trending' | 'explore'
@@ -17,58 +18,6 @@ const TABS: { value: FeedTab; label: string; icon: typeof Globe; requiresAuth?: 
   { value: 'trending', label: 'Trending', icon: TrendingUp },
   { value: 'explore', label: 'Explore', icon: Compass },
 ]
-
-function FeedItemCard({ item }: { item: FeedItem }) {
-  // FeedItem is a flat object with itemType = 'post' | 'video'
-  return (
-    <article className="group overflow-hidden rounded-xl border border-border bg-card text-card-foreground transition-all duration-200 hover:shadow-md hover:border-border/80 p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {item.itemType}
-        </span>
-      </div>
-      {item.coverImageUrl && item.itemType === 'post' && (
-        <a href={`/post/${item.slug}`} className="block overflow-hidden aspect-video rounded-lg mb-3">
-          <img
-            src={item.coverImageUrl}
-            alt={item.title ?? ''}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        </a>
-      )}
-      {item.thumbnailUrl && item.itemType === 'video' && (
-        <a href={`/watch/${item.id}`} className="block overflow-hidden aspect-video rounded-lg mb-3">
-          <img
-            src={item.thumbnailUrl}
-            alt={item.title ?? ''}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        </a>
-      )}
-      <a
-        href={item.itemType === 'post' ? `/post/${item.slug}` : `/watch/${item.id}`}
-        className="block"
-      >
-        <h2 className="font-semibold text-base leading-snug text-foreground hover:text-primary transition-colors line-clamp-2">
-          {item.title}
-        </h2>
-      </a>
-      {item.excerpt && (
-        <p className="mt-1 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-          {item.excerpt}
-        </p>
-      )}
-      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-        <span>{item.viewCount} views</span>
-        {item.publishedAt && (
-          <span>{new Date(item.publishedAt).toLocaleDateString()}</span>
-        )}
-      </div>
-    </article>
-  )
-}
 
 function InfiniteFeed({
   queryKey,
@@ -95,7 +44,8 @@ function InfiniteFeed({
   return (
     <InfiniteList
       items={items}
-      renderItem={(item) => <FeedItemCard item={item} />}
+      renderItem={(item) => <FeedCard item={item} />}
+      keyExtractor={(item: FeedItem) => item.id}
       hasNextPage={!!hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       fetchNextPage={fetchNextPage}
