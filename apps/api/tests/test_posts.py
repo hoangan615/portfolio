@@ -212,3 +212,78 @@ async def test_submit_post_for_review(
     )
     assert response.status_code == 200
     assert response.json()["status"] == "pending_review"
+
+
+# ── Publish post ──────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_publish_post(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    draft = Post(
+        user_id=regular_user.id,
+        type="article",
+        title="Publishable Post",
+        slug=f"publish-{uuid.uuid4().hex[:8]}",
+        content="<p>Content</p>",
+        status="draft",
+    )
+    db_session.add(draft)
+    await db_session.flush()
+
+    response = await client.post(
+        f"/api/v1/posts/{draft.id}/publish",
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "published"
+    assert body["published_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_publish_other_users_post_forbidden(
+    client: AsyncClient,
+    second_user: User,
+    db_session: AsyncSession,
+    auth_headers: dict,
+):
+    post = Post(
+        user_id=second_user.id,
+        type="article",
+        title="Other User Post",
+        slug=f"other-{uuid.uuid4().hex[:8]}",
+        status="draft",
+    )
+    db_session.add(post)
+    await db_session.flush()
+
+    response = await client.post(
+        f"/api/v1/posts/{post.id}/publish",
+        headers=auth_headers,
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_publish_post_unauthenticated(
+    client: AsyncClient,
+    regular_user: User,
+    db_session: AsyncSession,
+):
+    post = Post(
+        user_id=regular_user.id,
+        type="article",
+        title="Unauth Publish",
+        slug=f"unauth-{uuid.uuid4().hex[:8]}",
+        status="draft",
+    )
+    db_session.add(post)
+    await db_session.flush()
+
+    response = await client.post(f"/api/v1/posts/{post.id}/publish")
+    assert response.status_code == 401

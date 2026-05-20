@@ -57,6 +57,11 @@ class ModerationActionCreate(BaseModel):
     report_id: UUID | None = None
 
 
+class UserWarningCreate(BaseModel):
+    user_id: UUID
+    reason: str = Field(..., max_length=500)
+
+
 class UserWarningOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

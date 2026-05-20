@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router'
 import {
@@ -83,7 +84,7 @@ export default function PostDetail({ slug }: PostDetailProps) {
       {/* Content */}
       <div
         className="[&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mb-4 [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mb-3 [&>h3]:text-lg [&>h3]:font-semibold [&>h3]:mb-2 [&>p]:mb-4 [&>p]:leading-relaxed [&>ul]:mb-4 [&>ul]:list-disc [&>ul]:pl-6 [&>ol]:mb-4 [&>ol]:list-decimal [&>ol]:pl-6 [&>li]:mb-1 [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-muted-foreground [&>blockquote]:mb-4 [&>pre]:mb-4 [&>pre]:overflow-x-auto [&>pre]:rounded-lg [&>pre]:bg-muted [&>pre]:p-4 [&>code]:rounded [&>code]:bg-muted [&>code]:px-1 [&>code]:py-0.5 [&>code]:text-sm [&>a]:text-primary [&>a]:underline [&>img]:rounded-lg [&>img]:mb-4 max-w-none mb-10 text-foreground"
-        dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content ?? '') }}
       />
 
       {/* Share bar */}

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router'
 import {
   Plus,
   FileText,
+  Globe,
   Trash2,
   Eye,
   Search,
@@ -77,6 +78,24 @@ export default function DashboardPostsPage() {
       toast.success('Post deleted')
     },
     onError: () => toast.error('Failed to delete post'),
+  })
+
+  const [publishingId, setPublishingId] = useState<string | null>(null)
+
+  const publishMutation = useMutation({
+    mutationFn: (id: string) => {
+      setPublishingId(id)
+      return postsApi.publish(id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.posts })
+      toast.success('Post published!')
+      setPublishingId(null)
+    },
+    onError: () => {
+      toast.error('Failed to publish post')
+      setPublishingId(null)
+    },
   })
 
   const posts = (data?.items ?? [] as DashboardPost[]).filter((p) =>
@@ -188,6 +207,18 @@ export default function DashboardPostsPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-1 shrink-0">
+                  {status !== 'published' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-green-600 hover:text-green-600"
+                      loading={publishingId === post.id}
+                      aria-label="Publish post"
+                      onClick={() => publishMutation.mutate(post.id)}
+                    >
+                      <Globe className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Link to={ROUTES.post(post.slug)}>
                     <Button size="sm" variant="ghost" aria-label="View post">
                       <Eye className="h-4 w-4" />

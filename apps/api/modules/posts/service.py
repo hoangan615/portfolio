@@ -159,3 +159,19 @@ async def submit_for_review(db: AsyncSession, post_id: UUID, user_id: UUID) -> P
     await db.flush()
     await db.refresh(post)
     return post
+
+
+async def publish_post(db: AsyncSession, post_id: UUID, user_id: UUID) -> Post:
+    post = await get_post_by_id(db, post_id)
+    if post.user_id != user_id:
+        from shared.exceptions import ForbiddenError
+        raise ForbiddenError("Not your post")
+    if post.status == "published":
+        return post
+    post.status = "published"
+    if not post.published_at:
+        post.published_at = datetime.now(UTC)
+    db.add(post)
+    await db.flush()
+    await db.refresh(post)
+    return post

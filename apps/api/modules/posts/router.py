@@ -70,3 +70,8 @@ async def delete_post(post_id: UUID, current_user: CurrentUser, db: DBDep):
 @router.post("/{post_id}/submit", response_model=schemas.PostDetail, dependencies=[MemberRequired])
 async def submit_post(post_id: UUID, current_user: CurrentUser, db: DBDep):
     return await service.submit_for_review(db, post_id, current_user.id)  # type: ignore[union-attr]
+
+
+@router.post("/{post_id}/publish", response_model=schemas.PostDetail, dependencies=[MemberRequired])
+async def publish_post(post_id: UUID, current_user: CurrentUser, db: DBDep):
+    return await service.publish_post(db, post_id, current_user.id)  # type: ignore[union-attr]

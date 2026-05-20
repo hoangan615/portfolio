@@ -40,6 +40,12 @@ export default function UserProfile({ username }: UserProfileProps) {
 
   const isOwner = currentUser?.username === username
 
+  const { data: followStatus } = useQuery({
+    queryKey: [...QUERY_KEYS.user(profile?.id ?? ''), 'follow-status'],
+    queryFn: () => usersApi.getFollowStatus(profile!.id),
+    enabled: !!profile?.id && !isOwner && !!currentUser,
+  })
+
   // Posts infinite query — needs user's UUID (id)
   const postsQuery = useInfiniteQuery({
     queryKey: QUERY_KEYS.userPosts(username),
@@ -102,7 +108,7 @@ export default function UserProfile({ username }: UserProfileProps) {
               ) : (
                 <FollowButton
                   userId={profile.id}
-                  isFollowing={false}
+                  isFollowing={followStatus?.isFollowing ?? false}
                 />
               )}
             </div>
