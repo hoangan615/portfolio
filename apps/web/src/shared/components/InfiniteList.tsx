@@ -16,6 +16,7 @@ interface InfiniteListProps<T> {
   className?: string
   itemClassName?: string
   grid?: boolean
+  keyExtractor?: (item: T, index: number) => string
 }
 
 export default function InfiniteList<T>({
@@ -31,6 +32,7 @@ export default function InfiniteList<T>({
   className,
   itemClassName,
   grid = false,
+  keyExtractor,
 }: InfiniteListProps<T>) {
   const { sentinelRef } = useInfiniteScroll({
     hasNextPage,
@@ -66,7 +68,7 @@ export default function InfiniteList<T>({
         )}
       >
         {items.map((item, index) => (
-          <div key={index} className={itemClassName}>
+          <div key={keyExtractor ? keyExtractor(item, index) : index} className={itemClassName}>
             {renderItem(item, index)}
           </div>
         ))}

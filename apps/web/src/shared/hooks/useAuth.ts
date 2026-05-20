@@ -36,11 +36,9 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: (credentials: RegisterCredentials) => authApi.register(credentials),
-    onSuccess: (data) => {
-      login(data.accessToken, data.user)
-      queryClient.setQueryData(QUERY_KEYS.me, data.user)
-      toast.success('Account created!', 'Welcome to the community.')
-      navigate('/')
+    onSuccess: () => {
+      toast.success('Account created!', 'Please check your email to verify your account.')
+      navigate('/login')
     },
     onError: () => {
       toast.error('Registration failed', 'Please check your details and try again.')

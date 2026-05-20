@@ -88,8 +88,12 @@ async def following_feed(db: AsyncSession, user_id: UUID, params: PageParams) ->
     video_count = (await db.execute(select(func.count()).select_from(video_q.subquery()))).scalar_one()
     total = post_count + video_count
 
-    posts = list((await db.execute(post_q.order_by(Post.published_at.desc().nullslast()))).scalars().all())
-    videos = list((await db.execute(video_q.order_by(Video.published_at.desc().nullslast()))).scalars().all())
+    posts = list((await db.execute(
+        post_q.order_by(Post.published_at.desc().nullslast()).limit(params.limit + params.offset)
+    )).scalars().all())
+    videos = list((await db.execute(
+        video_q.order_by(Video.published_at.desc().nullslast()).limit(params.limit + params.offset)
+    )).scalars().all())
 
     items: list[FeedItem] = []
     items.extend(_post_to_feed_item(p) for p in posts)
@@ -117,8 +121,12 @@ async def trending_feed(db: AsyncSession, params: PageParams) -> tuple[list[Feed
     video_count = (await db.execute(select(func.count()).select_from(video_q.subquery()))).scalar_one()
     total = post_count + video_count
 
-    posts = list((await db.execute(post_q)).scalars().all())
-    videos = list((await db.execute(video_q)).scalars().all())
+    posts = list((await db.execute(
+        post_q.limit(params.limit + params.offset)
+    )).scalars().all())
+    videos = list((await db.execute(
+        video_q.limit(params.limit + params.offset)
+    )).scalars().all())
 
     items: list[FeedItem] = []
     items.extend(_post_to_feed_item(p) for p in posts)

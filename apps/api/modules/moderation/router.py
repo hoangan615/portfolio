@@ -66,12 +66,11 @@ async def create_action(body: schemas.ModerationActionCreate, current_user: Curr
     dependencies=[ModeratorRequired],
 )
 async def issue_warning(
-    user_id: UUID,
-    reason: str,
+    body: schemas.UserWarningCreate,
     current_user: CurrentUser,
     db: DBDep,
 ):
-    return await service.issue_warning(db, user_id, current_user.id, reason)  # type: ignore[union-attr]  # pragma: no cover
+    return await service.issue_warning(db, body.user_id, current_user.id, body.reason)  # type: ignore[union-attr]  # pragma: no cover
 
 
 @router.get(
