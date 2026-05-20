@@ -39,6 +39,10 @@ export const QUERY_KEYS = {
   adminStats: ['admin', 'stats'] as const,
   adminUsers: ['admin', 'users'] as const,
   adminReports: ['admin', 'reports'] as const,
+
+  // Reactions
+  reactionSummary: (contentType: string, contentId: string) =>
+    ['reactions', 'summary', contentType, contentId] as const,
 } as const
 
 export const ROUTES = {
